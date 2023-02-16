@@ -25,7 +25,7 @@ public:
 
 	void destroySprite();
 
-private:
+protected:
 	int width, height;
 	SDL_Texture* texture;
 };

@@ -9,21 +9,27 @@ public:
 
 	bool init();
 
-	bool loadMedia();
-
-	void close();
-
 	void run();
 
 private:
-	//Screen dimension constants
-	int SCREEN_WIDTH = 640;
-	int SCREEN_HEIGHT = 480;
+#pragma region Window
+	
+	int SCREEN_WIDTH;
+	int SCREEN_HEIGHT;
 
-	//The window we'll be rendering to
-	SDL_Window* window = nullptr;
+	bool quit;
+	SDL_Event e;
+
+	void createWindow();
+	void pollEventWindow();
+	void close();
+	
+	SDL_Window* window;
 
 	//The surface contained by the window
-	SDL_Surface* screenSurface = nullptr;
+	SDL_Surface* screenSurface;
+
+#pragma endregion
+
 };
 

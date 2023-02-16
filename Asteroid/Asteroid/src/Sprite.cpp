@@ -26,6 +26,8 @@ void Sprite::drawSprite(int x, int y)
 
 void Sprite::getSpriteSize(int& w, int& h)
 {
+	w = this->width;
+	h = this->height;
 }
 
 void Sprite::setSpriteSize(int w, int h)
