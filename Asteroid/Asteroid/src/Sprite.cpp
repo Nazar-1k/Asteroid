@@ -1,6 +1,6 @@
 #include "Sprite.h"
-Sprite::Sprite(const char* path, int width, int height, SDL_Texture* texture, SDL_Renderer* renderer)
-	:width(width), height(height), texture(texture), renderer(renderer)
+Sprite::Sprite(const char* path, int width, int height, SDL_Renderer* renderer)
+	:width(width), height(height), renderer(renderer)
 {
 	loadFromFile(path);
 }
@@ -45,9 +45,9 @@ bool Sprite::loadFromFile(const char* path)
 	//Get rid of old loaded surface
 	SDL_FreeSurface(loadedSurface);
 
-
 	//Return success
 	texture = newTexture;
+	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
 	return texture != NULL;
 }
 
@@ -80,7 +80,6 @@ void Sprite::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* cente
 		renderQuad.w = clip->w;
 		renderQuad.h = clip->h;
 	}
-
 	//Render to screen
 	SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, flip);
 }

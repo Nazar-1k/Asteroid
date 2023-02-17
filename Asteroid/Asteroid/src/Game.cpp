@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game()
-	:SCREEN_WIDTH(640), SCREEN_HEIGHT(480), quit(false),
+	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
 	window(nullptr), renderer(nullptr)
 {
 	init();
@@ -23,7 +23,7 @@ bool Game::init()
 
 	//Create window
 	window = SDL_CreateWindow("Asteroid", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	if (window == nullptr)
+	if (!window)
 	{
 		std::cout << "Window could not be created! SDL Error:\n"<< SDL_GetError()<<std::endl;
 		return false;
@@ -31,26 +31,33 @@ bool Game::init()
 	
 	//Create renderer for window
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (renderer == nullptr)
+	if (!renderer)
 	{
 		std::cout << "Renderer could not be created!SDL Error :\n" << SDL_GetError() << std::endl;
 		return false;
 	}
-		
 
-
-	
+	bg = std::unique_ptr<BG>(new BG{ "data/background.png", SCREEN_WIDTH, SCREEN_HEIGHT, renderer });
+	if (!bg)
+	{
+		std::cout << "BG ERRoR:\n"<< std::endl;
+		return false;
+	}
 
 	return true;
 }
 
 void Game::update()
 {
+
 }
 
 void Game::render()
 {
 	SDL_RenderClear(renderer);
+	
+	bg->render();
+
 
 	SDL_RenderPresent(renderer);
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "Sprite.h"
 #include "Background.h"
 
 class Game
@@ -16,6 +17,7 @@ public:
 
 	void run();
 
+
 private:
 #pragma region Window
 	
@@ -29,6 +31,6 @@ private:
 	SDL_Renderer* renderer;
 
 #pragma endregion
-	BG bg;
+	std::unique_ptr<BG> bg;
 };
 

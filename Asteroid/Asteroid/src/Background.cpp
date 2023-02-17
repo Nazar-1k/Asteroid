@@ -1,7 +1,7 @@
 #include "Background.h"
+#include "Game.h"
 
-BG::~BG()
+void BG::render()
 {
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
 }
-
-void render(int x, int y);

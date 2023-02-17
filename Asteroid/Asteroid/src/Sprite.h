@@ -8,7 +8,7 @@ class Sprite
 public:
 
 	Sprite() :width(0), height(0), texture(nullptr), renderer(nullptr) {}
-	Sprite(const char* path, int width, int height, SDL_Texture* texture, SDL_Renderer* renderer);
+	Sprite(const char* path, int width, int height, SDL_Renderer* renderer);
 	virtual ~Sprite();
 
 	//Loads image at specified path
@@ -24,7 +24,7 @@ public:
 	void setAlpha(Uint8 alpha);
 
 	//Renders texture at given point
-	virtual void render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	void render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
 
 	void getSize(int& w, int& h);
