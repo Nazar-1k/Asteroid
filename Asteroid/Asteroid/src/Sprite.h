@@ -1,32 +1,47 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_image.h>
-#include <string>
+#include <iostream>
 
 class Sprite
 {
 public:
 
-	Sprite() :width(0), height(0), texture(nullptr) {}
-	Sprite(int w, int h, SDL_Texture* tex) :width(w), height(h), texture(tex) {}
-	~Sprite();
+	Sprite() :width(0), height(0), texture(nullptr), renderer(nullptr) {}
+	Sprite(const char* path, int width, int height, SDL_Texture* texture, SDL_Renderer* renderer);
+	virtual ~Sprite();
+
+	//Loads image at specified path
+	bool loadFromFile(const char* path);
+
+	//Set color modulation
+	void setColor(Uint8 red, Uint8 green, Uint8 blue);
+
+	//Set blending
+	void setBlendMode(SDL_BlendMode blending);
+
+	//Set alpha modulation
+	void setAlpha(Uint8 alpha);
+
+	//Renders texture at given point
+	virtual void render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
 
-	void createSprite(const char path[]);
-	void drawSprite(int x, int y);
+	void getSize(int& w, int& h);
+	int getWidth() { return width; }
+	int getHeight() { return height; }
 
-	void getSpriteSize(int& w, int& h);
-	int getSpriteWidth() { return width; }
-	int getSpriteHeight() { return height; }
+	void setSize(int w, int h);
+	void setWith(int w);
+	void setHeight(int h);
 
-	void setSpriteSize(int w, int h);
-	void setSpriteWith(int w);
-	void setSpriteHeight(int h);
-
-	void destroySprite();
+	//Deallocates texture
+	void free();
 
 protected:
 	int width, height;
 	SDL_Texture* texture;
+
+	SDL_Renderer* renderer;
 };
 

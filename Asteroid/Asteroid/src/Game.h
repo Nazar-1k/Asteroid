@@ -1,5 +1,5 @@
 #pragma once
-#include "Sprite.h"
+#include "Background.h"
 
 class Game
 {
@@ -8,6 +8,11 @@ public:
 	~Game();
 
 	bool init();
+	void update();
+	void render();
+
+	void pollEventWindow();
+	void close();
 
 	void run();
 
@@ -20,16 +25,10 @@ private:
 	bool quit;
 	SDL_Event e;
 
-	void createWindow();
-	void pollEventWindow();
-	void close();
-	
 	SDL_Window* window;
-
-	//The surface contained by the window
-	SDL_Surface* screenSurface;
+	SDL_Renderer* renderer;
 
 #pragma endregion
-
+	BG bg;
 };
 
