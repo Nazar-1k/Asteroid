@@ -22,7 +22,7 @@ bool Sprite::loadFromFile(const char* path)
 	SDL_Surface* loadedSurface = IMG_Load(path);
 	if (loadedSurface == NULL)
 	{
-		std::cout << "Unable to load image" << path << "SDL_image Error : \n" << IMG_GetError() << std::endl;
+		std::cout << "Unable to load image " << path << " SDL_image Error : \n" << IMG_GetError() << std::endl;
 		return texture != NULL;
 	}
 	
@@ -33,7 +33,7 @@ bool Sprite::loadFromFile(const char* path)
 	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 	if (newTexture == NULL)
 	{
-		std::cout << "Unable to create texture from" << path << "SDL Error: \n" << IMG_GetError() << std::endl;
+		std::cout << "Unable to create texture from " << path << "SDL Error: \n" << IMG_GetError() << std::endl;
 		return texture != NULL;
 	}
 
@@ -48,6 +48,7 @@ bool Sprite::loadFromFile(const char* path)
 	//Return success
 	texture = newTexture;
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
+	is_Empty = texture != NULL;
 	return texture != NULL;
 }
 
@@ -69,10 +70,10 @@ void Sprite::setAlpha(Uint8 alpha)
 	SDL_SetTextureAlphaMod(texture, alpha);
 }
 
-void Sprite::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Sprite::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	//Set rendering space and render to screen
-	SDL_Rect renderQuad = { x, y, width, height };
+	SDL_Rect renderQuad = { static_cast<int>(x),  static_cast<int>(y), width, height };
 
 	//Set clip rendering dimensions
 	if (clip != NULL)

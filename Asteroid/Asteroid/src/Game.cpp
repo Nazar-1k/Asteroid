@@ -2,9 +2,8 @@
 
 Game::Game()
 	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
-	window(nullptr), renderer(nullptr)
+	window(nullptr), renderer(nullptr), bg(nullptr)
 {
-	init();
 }
 
 Game::~Game()
@@ -36,11 +35,18 @@ bool Game::init()
 		std::cout << "Renderer could not be created!SDL Error :\n" << SDL_GetError() << std::endl;
 		return false;
 	}
-
+	//Create BG
 	bg = std::unique_ptr<BG>(new BG{ "data/background.png", SCREEN_WIDTH, SCREEN_HEIGHT, renderer });
-	if (!bg)
+	if (!bg->isEmpty())
 	{
-		std::cout << "BG ERRoR:\n"<< std::endl;
+		std::cout << "BG ERRoR: \n" << std::endl;
+		return false;
+	}
+
+	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", SCREEN_WIDTH, SCREEN_HEIGHT, renderer });
+	if (!bg->isEmpty())
+	{
+		std::cout << "Ship ERRoR: \n" << std::endl;
 		return false;
 	}
 
@@ -57,6 +63,7 @@ void Game::render()
 	SDL_RenderClear(renderer);
 	
 	bg->render();
+	ship->render();
 
 
 	SDL_RenderPresent(renderer);
@@ -74,12 +81,19 @@ void Game::pollEventWindow()
 
 void Game::run()
 {	
+	if (!init())
+	{
+		std::cout<<"Failed to initialize!\n"<<std::endl;
+	}
+	else
+	{
 		while (!quit)
 		{
 			pollEventWindow();
 			update();
 			render();
 		}
+	}	
 }
 
 void Game::close()

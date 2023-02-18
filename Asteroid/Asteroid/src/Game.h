@@ -1,6 +1,6 @@
 #pragma once
-#include "Sprite.h"
 #include "Background.h"
+#include "SpaceShip.h"
 
 class Game
 {
@@ -31,6 +31,11 @@ private:
 	SDL_Renderer* renderer;
 
 #pragma endregion
+#pragma region Sprites
+
 	std::unique_ptr<BG> bg;
+	std::unique_ptr<Ship> ship;
+
+#pragma endregion
 };
 
