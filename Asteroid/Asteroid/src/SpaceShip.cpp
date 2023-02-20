@@ -4,3 +4,7 @@
 //{
 //	
 //}
+
+void Ship::PoolEvent(SDL_Event event)
+{
+}

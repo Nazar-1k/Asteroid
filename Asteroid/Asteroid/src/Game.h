@@ -1,7 +1,8 @@
 #pragma once
-//#include "Background.h"
+
 #include <iostream>
 #include "SpaceShip.h"
+#include "Background.h"
 
 class Game
 {
