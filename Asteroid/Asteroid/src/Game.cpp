@@ -55,7 +55,7 @@ bool Game::init()
 
 void Game::update()
 {
-
+	ship->move();
 }
 
 void Game::render()
@@ -76,6 +76,7 @@ void Game::pollEventWindow()
 		//User requests quit
 		if (e.type == SDL_QUIT)
 			quit = true;
+		ship->PoolEvent(e);
 	}
 }
 
