@@ -117,12 +117,4 @@ void Sprite::free()
 		width = 0;
 		height = 0;
 	}
-	if (texture)
-	{
-		SDL_DestroyTexture(texture);
-		texture = nullptr;
-		renderer = nullptr;
-		width = 0;
-		height = 0;
-	}
 }

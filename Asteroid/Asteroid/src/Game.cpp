@@ -88,11 +88,21 @@ void Game::run()
 	}
 	else
 	{
+		
 		while (!quit)
 		{
+			fpsTimer.start();
+
 			pollEventWindow();
 			update();
 			render();
+
+
+			if (frameDelay > fpsTimer.getTicks())
+			{
+				//Wait remaining time
+				SDL_Delay(frameDelay - fpsTimer.getTicks());
+			}
 		}
 	}	
 }

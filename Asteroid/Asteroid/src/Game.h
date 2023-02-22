@@ -3,6 +3,7 @@
 #include <iostream>
 #include "SpaceShip.h"
 #include "Background.h"
+#include "Timer.h"
 
 class Game
 {
@@ -25,6 +26,12 @@ private:
 	
 	int SCREEN_WIDTH;
 	int SCREEN_HEIGHT;
+
+	const int FPS = 60;
+	const int frameDelay = 1000 / FPS;
+	//Timers
+	Timer fpsTimer;
+	
 
 	bool quit;
 	SDL_Event e;
