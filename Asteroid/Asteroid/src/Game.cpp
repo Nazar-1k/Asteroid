@@ -55,7 +55,7 @@ bool Game::init()
 
 void Game::update()
 {
-	ship->move();
+	ship->move(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void Game::render()
@@ -96,7 +96,6 @@ void Game::run()
 			pollEventWindow();
 			update();
 			render();
-
 
 			if (frameDelay > fpsTimer.getTicks())
 			{

@@ -7,50 +7,88 @@
 
 void Ship::PoolEvent(SDL_Event& e)
 {
-        if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+    //If a key was press
+    if (e.type == SDL_KEYDOWN)
+    {
+        //Adjust the velocity
+        if (e.key.keysym.sym == SDLK_UP)
         {
-            //Adjust the velocity
-            switch (e.key.keysym.sym)
-            {
-            case SDLK_UP: dy -= velocity; break;
-            case SDLK_DOWN: dy += velocity; break;
-            case SDLK_LEFT: dx -= velocity; break;
-            case SDLK_RIGHT: dx += velocity; break;
-            }
+            keyUP = true;
         }
-        //If a key was released
-        else if (e.type == SDL_KEYUP && e.key.repeat == 0)
+        if (e.key.keysym.sym == SDLK_DOWN)
         {
-            //Adjust the velocity
-            switch (e.key.keysym.sym)
-            {
-            case SDLK_UP: dy += velocity; break;
-            case SDLK_DOWN: dy -= velocity; break;
-            case SDLK_LEFT: dx += velocity; break;
-            case SDLK_RIGHT: dx -= velocity; break;
-            }
+            keyDown = true;
         }
-
+        if (e.key.keysym.sym == SDLK_LEFT)
+        {
+            keyLeft = true;
+        }
+        if (e.key.keysym.sym == SDLK_RIGHT)
+        {
+            keyRight = true;
+        }
+    }
+    //If a key was released
+    if (e.type == SDL_KEYUP)
+    {
+        if (e.key.keysym.sym == SDLK_UP)
+        {
+            keyUP = false;
+        }
+        if (e.key.keysym.sym == SDLK_DOWN)
+        {
+            keyDown = false;
+        }
+        if (e.key.keysym.sym == SDLK_LEFT)
+        {
+            keyLeft = false;
+        }
+        if (e.key.keysym.sym == SDLK_RIGHT)
+        {
+            keyRight = false;
+        }
+    }
 }
 
-void Ship::move()
+void Ship::move(int width , int height)
 {
-    x += dx;
-    y += dy;
+    #pragma region moveShip
+        if (keyUP == true)
+            dy -= velocity;
+        if (keyDown == true)
+            dy += velocity;
+        if (keyRight == true)
+            dx += velocity;
+        if (keyLeft == true)
+            dx -= velocity;
 
-    //If the dot went too far to the left or right
-    if ((x < 0) || (x + getWidth() > 1000))
-    {
-        //Move back
-        x -= dx;
-    }
+        x += dx;
+        y += dy;
 
 
-    //If the dot went too far up or down
-    if ((y < 0) || (y + getHeight() > 600))
-    {
-        //Move back
-        y -= dy;
-    }
+    #pragma endregion
+   
+    #pragma region MaxSpeed
+        if (dx >= maxVelocity)
+            dx = maxVelocity;
+        else if (dx <= -maxVelocity)
+            dx = -maxVelocity;
 
+        if (dy >= maxVelocity)
+            dy = maxVelocity;
+        else if (dy <= -maxVelocity)
+            dy = -maxVelocity;
+    #pragma endregion
+
+    teleport(width, height);
 }
+
+void Ship::teleport(float w_scrin, float h_scrin)
+{
+    if (x <= 0.0f)	x = x + (float)w_scrin;
+    if (x >= (float)w_scrin)	x = x - (float)w_scrin;
+    if (y <= 0.0f)	y = y + (float)h_scrin;
+    if (y >= (float)h_scrin) y = y - (float)h_scrin;
+}
+
+
