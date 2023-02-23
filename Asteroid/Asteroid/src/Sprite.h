@@ -49,13 +49,15 @@ public:
 
 	bool isEmpty() { return is_Empty; }
 
+	Sprite operator=(const Sprite& other);
+
 protected:
 	int width, height;
 
 	SDL_Texture* texture;
 	SDL_Renderer* renderer;
 
-	double angle;
+	float angle;
 	SDL_Point* center;
 	SDL_RendererFlip flip;
 

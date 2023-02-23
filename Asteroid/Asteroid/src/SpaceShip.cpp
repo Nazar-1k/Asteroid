@@ -3,9 +3,36 @@
 Ship::Ship(const char* path, SDL_Renderer* renderer)
     : Sprite(path, renderer)
 {
-    angleVelocity = 0;
     x = 0;
     y = 0;
+
+    RedTexture = new Sprite{ "data/red.bmp", renderer };
+    if (!RedTexture->isEmpty())
+    {
+        std::cout << "RedTexture ERRoR: \n" << std::endl;
+    }
+
+    OrangeTexture = new Sprite{ "data/orange.bmp", renderer };
+    if (!OrangeTexture->isEmpty())
+    {
+        std::cout << "OrangeTexture ERRoR: \n" << std::endl;
+    }
+
+    ShimmerTexture = new Sprite{ "data/shimmer.bmp", renderer };
+    if (!ShimmerTexture->isEmpty())
+    {
+        std::cout << "ShimmerTexture ERRoR: \n" << std::endl;
+    }
+}
+
+Ship::~Ship()
+{
+    //Delete particles
+    for (int i = 0; i < 10; ++i)
+    {
+        delete particles[i];
+      /*  particles[i]->clear();*/
+    }
 }
 
 
@@ -58,23 +85,29 @@ void Ship::move(int width_S , int height_S)
 {
     #pragma region moveShip
     if (keyUP == true)
-        dy -= velocity;
+    {
+        dx += sin(angle * 3.14159 / 180) * velocity / 10;
+        dy += -cos(angle * 3.14159 / 180) * velocity / 10;
+    }
+      /*  dy -= velocity;*/
     if (keyDown == true)
-        dy += velocity;
+    {
+        dy = 0;
+        dx = 0;
+    }
     if (keyRight == true)
     {
-        angleVelocity += velocity;
+        angle += velocity * 5;
+       
     }
     if (keyLeft == true)
     {
-        angleVelocity -= velocity;
+        angle -= velocity * 5;
+     
     }
-
         x += dx;
         y += dy;
-        angle += angleVelocity;
-
-
+     
     #pragma endregion
    
     #pragma region MaxSpeed
@@ -88,10 +121,6 @@ void Ship::move(int width_S , int height_S)
         else if (dy <= -maxVelocity)
             dy = -maxVelocity;
 
-        if (angleVelocity >= maxVelocity / 2)
-            angleVelocity = maxVelocity / 2;
-        else if (angleVelocity <= -maxVelocity / 2)
-            angleVelocity = -maxVelocity / 2;
     #pragma endregion
 
 }
@@ -119,18 +148,15 @@ void Ship::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererF
             renderQuad2.w = clip->w;
             renderQuad2.h = clip->h;
         }
-       
+        //Render to screen   
         SDL_RenderCopyEx(renderer, texture, clip, &renderQuad2, angle, center, SDL_FLIP_HORIZONTAL);
-   /* x = fx;
-    y = fy;*/
     }
    
+    //Render to screen
     SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
 
    
-    //Render to screen
-    
-    
+    renderParticles();
 }
 
 
@@ -168,6 +194,11 @@ bool Ship::teleport(float& ox, float& oy, int w_scrin, int h_scrin)
     x = ox;
     y = oy;
     return isteleport;
+}
+
+void Ship::renderParticles()
+{
+   
 }
 
 

@@ -1,13 +1,12 @@
 #pragma once
-#include "Sprite.h"
-#include "Timer.h"
+#include "FireParticale.h"
 
 class Ship : public Sprite
 {
 public:
 	Ship();
 	Ship(const char* path, SDL_Renderer* renderer);
-	~Ship(){}
+	~Ship();
 	void PoolEvent(SDL_Event& event);
 	void moveArrow();
 	void moveMouse();
@@ -23,14 +22,13 @@ private:
 	bool keyRight = false;
 	bool keyLeft = false;
 
-	const float velocity = 0.99999;
-	const float maxVelocity = 10;
-
-
-	float angleVelocity;
-
-
+	const float velocity = 1.5;
+	const float maxVelocity = 8;
 
 	float dx, dy;
+
+
+	//Shows the particles
+	void renderParticles();
 	
 };

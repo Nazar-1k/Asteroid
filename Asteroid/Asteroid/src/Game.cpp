@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game()
-	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(1000), quit(false),
+	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
 	window(nullptr), renderer(nullptr), bg(nullptr)
 {
 }

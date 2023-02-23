@@ -120,3 +120,16 @@ void Sprite::free()
 		height = 0;
 	}
 }
+
+Sprite Sprite::operator=(const Sprite& other)
+{
+	if (this != &other)
+	{
+		
+
+	}
+
+
+
+	return *this;
+}
