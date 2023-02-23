@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game()
-	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
+	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(1000), quit(false),
 	window(nullptr), renderer(nullptr), bg(nullptr)
 {
 }
@@ -36,14 +36,14 @@ bool Game::init()
 		return false;
 	}
 	//Create BG
-	bg = std::unique_ptr<BG>(new BG{ "data/background.png", SCREEN_WIDTH, SCREEN_HEIGHT, renderer });
+	bg = std::unique_ptr<BG>(new BG{ "data/background.png", renderer });
 	if (!bg->isEmpty())
 	{
 		std::cout << "BG ERRoR: \n" << std::endl;
 		return false;
 	}
 
-	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", SCREEN_WIDTH, SCREEN_HEIGHT, renderer });
+	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", renderer });
 	if (!bg->isEmpty())
 	{
 		std::cout << "Ship ERRoR: \n" << std::endl;

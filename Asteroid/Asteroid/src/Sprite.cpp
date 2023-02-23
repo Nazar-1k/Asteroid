@@ -1,8 +1,9 @@
 #include "Sprite.h"
-Sprite::Sprite(const char* path, int width, int height, SDL_Renderer* renderer)
-	:width(width), height(height), renderer(renderer)
+Sprite::Sprite(const char* path, SDL_Renderer* renderer)
+	: renderer(renderer)
 {
 	loadFromFile(path);
+	
 }
 
 Sprite::~Sprite()
@@ -72,6 +73,7 @@ void Sprite::setAlpha(Uint8 alpha)
 
 void Sprite::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
+	
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { static_cast<int>(x),  static_cast<int>(y), width, height };
 

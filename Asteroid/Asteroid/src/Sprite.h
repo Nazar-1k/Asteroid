@@ -10,7 +10,7 @@ public:
 	Sprite() :width(0), height(0), texture(nullptr), renderer(nullptr),
 		angle(0.0), center(nullptr), flip(SDL_FLIP_NONE),
 		is_Empty(false), x(0), y(0) {}
-	Sprite(const char* path, int width, int height, SDL_Renderer* renderer);
+	Sprite(const char* path, SDL_Renderer* renderer);
 	virtual ~Sprite();
 
 	//Loads image at specified path
