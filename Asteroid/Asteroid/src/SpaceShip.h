@@ -1,6 +1,6 @@
 #pragma once
 #include "FireParticale.h"
-
+//#include "Sprite.h"
 class Ship : public Sprite
 {
 public:
@@ -27,6 +27,10 @@ private:
 
 	float dx, dy;
 
+	//Particle count
+	static const int TOTAL_PARTICLES = 20;
+	//The particles
+	Particle* particles[TOTAL_PARTICLES];
 
 	//Shows the particles
 	void renderParticles();

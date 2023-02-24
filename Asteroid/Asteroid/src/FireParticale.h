@@ -2,22 +2,23 @@
 
 #include "Sprite.h"
 
-class Fire
+class Particle
 {
 public:
 	//Initialize position and animation
-	Fire();
-	Fire(SDL_Renderer* renderer);
+	Particle(float x, float y, float side, float angle, SDL_Renderer* renderer);
 
 	//Shows the particle
-	void render(Sprite* ShimmerTexture);
-
+	void render();
 	//Checks if particle is dead
 	bool isDead();
+	void setdead(bool dead);
 
-private:
 	//Offsets
-	int x, y;
+	float x, y;
+	
+	float dx, dy;
+private:
 
 	//Current frame of animation
 	int Frame;
@@ -25,6 +26,6 @@ private:
 	//Type of particle
 	Sprite* Texture;
 
-	
+	bool dead;
 };
 

@@ -1,4 +1,9 @@
 #include "Sprite.h"
+
+static const size_t countSprite{ 4 };
+static Sprite arraySprite[countSprite];
+
+
 Sprite::Sprite(const char* path, SDL_Renderer* renderer)
 	: renderer(renderer)
 {
@@ -87,10 +92,30 @@ void Sprite::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_Rendere
 	SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, flip);
 }
 
+void Sprite::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+{
+	//Set rendering space and render to screen
+	SDL_Rect renderQuad = { static_cast<int>(x),  static_cast<int>(y), width, height };
+
+	//Set clip rendering dimensions
+	if (clip != NULL)
+	{
+		renderQuad.w = clip->w;
+		renderQuad.h = clip->h;
+	}
+	//Render to screen
+	SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, flip);
+}
+
 void Sprite::getSize(int& w, int& h)
 {
 	w = this->width;
 	h = this->height;
+}
+
+void Sprite::setRenderer(SDL_Renderer* renderer)
+{
+	this->renderer = renderer;
 }
 
 void Sprite::setSize(int w, int h)
@@ -119,17 +144,4 @@ void Sprite::free()
 		width = 0;
 		height = 0;
 	}
-}
-
-Sprite Sprite::operator=(const Sprite& other)
-{
-	if (this != &other)
-	{
-		
-
-	}
-
-
-
-	return *this;
 }

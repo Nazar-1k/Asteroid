@@ -6,32 +6,20 @@ Ship::Ship(const char* path, SDL_Renderer* renderer)
     x = 0;
     y = 0;
 
-    RedTexture = new Sprite{ "data/red.bmp", renderer };
-    if (!RedTexture->isEmpty())
+    //Initialize particles
+    for (int i = 0; i < TOTAL_PARTICLES; ++i)
     {
-        std::cout << "RedTexture ERRoR: \n" << std::endl;
-    }
-
-    OrangeTexture = new Sprite{ "data/orange.bmp", renderer };
-    if (!OrangeTexture->isEmpty())
-    {
-        std::cout << "OrangeTexture ERRoR: \n" << std::endl;
-    }
-
-    ShimmerTexture = new Sprite{ "data/shimmer.bmp", renderer };
-    if (!ShimmerTexture->isEmpty())
-    {
-        std::cout << "ShimmerTexture ERRoR: \n" << std::endl;
+        particles[i] = new Particle(x, y, width, angle, renderer);
+        std::cout << "Width = " << width << std::endl;
     }
 }
 
 Ship::~Ship()
 {
     //Delete particles
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < TOTAL_PARTICLES; ++i)
     {
         delete particles[i];
-      /*  particles[i]->clear();*/
     }
 }
 
@@ -129,7 +117,7 @@ void Ship::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererF
 {
     angle = this->angle;
     //Set rendering space and render to screen
-    SDL_Rect renderQuad = { static_cast<int>(x),  static_cast<int>(y), width, height };
+    SDL_Rect renderQuad = { static_cast<int>(x - width / 2),  static_cast<int>(y - height / 2), width, height };
 
     //Set clip rendering dimensions
     if (clip != NULL)
@@ -139,10 +127,10 @@ void Ship::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererF
     }
     
     float fx, fy;
-    if (teleport(fx, fy, 1000, 1000))
+    if (teleport(fx, fy, 1000, 600))
     {
         
-        SDL_Rect renderQuad2 = { static_cast<int>(fx),  static_cast<int>(fy), width, height };
+        SDL_Rect renderQuad2 = { static_cast<int>(fx - width / 2),  static_cast<int>(fy - height / 2), width, height };
         if (clip != NULL)
         {
             renderQuad2.w = clip->w;
@@ -156,7 +144,8 @@ void Ship::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererF
     SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
 
    
-    renderParticles();
+        renderParticles();
+   
 }
 
 
@@ -166,27 +155,27 @@ bool Ship::teleport(float& ox, float& oy, int w_scrin, int h_scrin)
     bool isteleport = false;
     ox = x;
     oy = y;
-    if (y < 0.0f)
+    if (y - height / 2 < 0.0f)
     {
         oy = y + h_scrin;
          
         isteleport = true;
     }
 
-    if (y + height >= h_scrin)
+    if (y + height / 2 >= h_scrin)
     {
         oy = y - h_scrin;
       
         isteleport = true;
     }
 
-    if (x < 0.0f)
+    if (x - width / 2 < 0.0f)
     {
         ox = x + w_scrin;
       
         isteleport =  true;
     }
-    if (x + width >= w_scrin)
+    if (x + width / 2 >= w_scrin)
     {
         ox = x - w_scrin;
         isteleport = true;
@@ -198,7 +187,32 @@ bool Ship::teleport(float& ox, float& oy, int w_scrin, int h_scrin)
 
 void Ship::renderParticles()
 {
-   
+    if (keyUP)
+    {
+        //Go through particles
+        for (int i = 0; i < TOTAL_PARTICLES; ++i)
+        {
+            //Delete and replace dead particles
+            if (particles[i]->isDead())
+            {
+                delete particles[i];
+                particles[i] = new Particle(x, y, width, angle, renderer);
+            }
+        }
+
+        //Show particles
+        for (int i = 0; i < TOTAL_PARTICLES; ++i)
+        {
+            particles[i]->render();
+        }
+    }
+    else
+    {
+        for (int i = 0; i < TOTAL_PARTICLES; ++i)
+        {
+            particles[i]->setdead(true);
+        }
+    }
 }
 
 

@@ -27,6 +27,7 @@ public:
 
 	//Renders texture at given point
 	void render(SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	void render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	
 	void getSize(int& w, int& h);
 	int getWidth() { return width; }
@@ -35,7 +36,7 @@ public:
 	float getX() { return x; }
 	float getY() { return y; }
 
-
+	void setRenderer(SDL_Renderer* renderer);
 
 	void setSize(int w, int h);
 	void setWith(int w);
