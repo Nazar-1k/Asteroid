@@ -7,6 +7,8 @@ class Particle
 public:
 	//Initialize position and animation
 	Particle(float x, float y, float side, float angle, SDL_Renderer* renderer);
+	
+
 
 	//Shows the particle
 	void render();

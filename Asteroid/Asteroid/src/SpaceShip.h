@@ -1,6 +1,7 @@
 #pragma once
 #include "FireParticale.h"
-//#include "Sprite.h"
+#include <SDL_mixer.h>
+
 class Ship : public Sprite
 {
 public:

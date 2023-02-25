@@ -52,31 +52,17 @@ Particle::Particle(float x, float y, float side, float angle, SDL_Renderer* rend
 		texture_is_load = true;
 	}
 
-	/*float angleInRadians = angle * M_PI / 180.0;
+	// Визначення позиції вогню
+	int fireX = x;
+	int fireY = y - side / 2;
 
-	this->x = x_botom * cos(angleInRadians) - y_botom * sin(angleInRadians) + x;
-	this->y = x_botom * sin(angleInRadians) + y_botom * cos(angleInRadians) + y + side / 2;*/
-	// Визначення координат нижньої точки корабля
-	 float x_botom = x;
-	 float y_botom = y + side / 2;
-
-	// Поворот координат точки приєднання навколо центра корабля
 	float angleInRadians = angle * M_PI / 180.0;
-	this->x = x_botom * cos(angleInRadians) - y_botom * sin(angleInRadians) + x; (rand() % 25);
-	this->y = x_botom * sin(angleInRadians) + y_botom * cos(angleInRadians) + (rand() % 25);
+	// Обертання корабля навколо своїх координат
+	this->x = (x - fireX) * cos(angleInRadians) - (y - fireY) * sin(angleInRadians) + fireX+rand()%5;
+	this->y = (x - fireX) * sin(angleInRadians) + (y - fireY) * cos(angleInRadians) + fireY + side/2+rand() % 5;
 
-	// Визначення координат точки приєднання з урахуванням розмірів об'єкту
-	
-	
-	
+	std::cout << angleInRadians << std::endl;
 
-
-
-
-
-	/*this->x =x +(rand() % 25);
-	this->y =y +(rand() % 25);*/
-   
     //Initialize animation
     Frame = rand() % 5;
 
@@ -88,6 +74,7 @@ Particle::Particle(float x, float y, float side, float angle, SDL_Renderer* rend
     case 2: Texture = &GreyTexture; break;
     }
 }
+
 
 void Particle::render()
 {

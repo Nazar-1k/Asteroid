@@ -1,5 +1,7 @@
 #include "SpaceShip.h"
 
+static Mix_Chunk* fireSound = nullptr;
+
 Ship::Ship(const char* path, SDL_Renderer* renderer)
     : Sprite(path, renderer)
 {
@@ -10,7 +12,13 @@ Ship::Ship(const char* path, SDL_Renderer* renderer)
     for (int i = 0; i < TOTAL_PARTICLES; ++i)
     {
         particles[i] = new Particle(x, y, width, angle, renderer);
-        std::cout << "Width = " << width << std::endl;
+    }
+
+    //Load music
+    fireSound = Mix_LoadWAV("soundEffects/fire.wav");
+    if (fireSound == NULL)
+    {
+        printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
     }
 }
 
@@ -21,6 +29,10 @@ Ship::~Ship()
     {
         delete particles[i];
     }
+
+    Mix_FreeChunk(fireSound);
+
+    fireSound = nullptr;
 }
 
 
@@ -76,6 +88,7 @@ void Ship::move(int width_S , int height_S)
     {
         dx += sin(angle * 3.14159 / 180) * velocity / 10;
         dy += -cos(angle * 3.14159 / 180) * velocity / 10;
+        Mix_PlayChannel(-1, fireSound, 0);
     }
       /*  dy -= velocity;*/
     if (keyDown == true)
@@ -144,7 +157,7 @@ void Ship::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererF
     SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
 
    
-        renderParticles();
+    renderParticles();
    
 }
 

@@ -27,6 +27,12 @@ bool Game::init()
 		std::cout << "Window could not be created! SDL Error:\n"<< SDL_GetError()<<std::endl;
 		return false;
 	}
+	//Initialize SDL_mixer
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError();
+		return  false;
+	}
 	
 	//Create renderer for window
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -117,6 +123,7 @@ void Game::close()
 	renderer = nullptr;
 
 	//Quit SDL subsystems
+	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
