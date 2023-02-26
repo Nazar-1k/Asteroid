@@ -63,6 +63,8 @@ bool Game::init()
 		return false;
 	}
 
+	showCursor(false);
+
 	return true;
 }
 
@@ -76,7 +78,7 @@ void Game::render()
 	SDL_RenderClear(renderer);
 	
 	bg->render();
-	arrow->render();
+	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
 	ship->render();
 	SDL_RenderPresent(renderer);
 }
@@ -91,9 +93,6 @@ void Game::pollEventWindow()
 		ship->PoolEvent(e);
 		arrow->PoolEvent(e);
 	}
-	
-
-	
 }
 void Game::showCursor(bool bShow)
 {

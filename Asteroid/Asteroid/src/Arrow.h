@@ -8,6 +8,6 @@ public:
 
 	void PoolEvent(SDL_Event& e);
 
-	void render();
+	void render(int width_s, int height_s);
 
 };
