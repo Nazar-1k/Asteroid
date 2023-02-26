@@ -61,8 +61,6 @@ Particle::Particle(float x, float y, float side, float angle, SDL_Renderer* rend
 	this->x = (x - fireX) * cos(angleInRadians) - (y - fireY) * sin(angleInRadians) + fireX+rand()%5;
 	this->y = (x - fireX) * sin(angleInRadians) + (y - fireY) * cos(angleInRadians) + fireY + side/2+rand() % 5;
 
-	std::cout << angleInRadians << std::endl;
-
     //Initialize animation
     Frame = rand() % 5;
 
