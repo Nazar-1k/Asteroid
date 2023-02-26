@@ -42,8 +42,8 @@ public:
 	void setWith(int w);
 	void setHeight(int h);
 
-	float setX();
-	float setY();
+	float setX(float x);
+	float setY(float y);
 
 	//Deallocates texture
 	void free();

@@ -4,6 +4,7 @@
 #include "SpaceShip.h"
 #include "Background.h"
 #include "Timer.h"
+#include "Arrow.h"
 
 
 class Game
@@ -18,6 +19,9 @@ public:
 
 	void pollEventWindow();
 	void close();
+
+	void showCursor(bool bShow);
+	void onMouseMove();
 
 	void run();
 
@@ -36,6 +40,7 @@ private:
 
 	bool quit;
 	SDL_Event e;
+	SDL_MouseMotionEvent mouse_e;
 
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -45,6 +50,7 @@ private:
 
 	std::unique_ptr<BG> bg;
 	std::unique_ptr<Ship> ship;
+	std::unique_ptr<Arrow> arrow;
 
 #pragma endregion
 };

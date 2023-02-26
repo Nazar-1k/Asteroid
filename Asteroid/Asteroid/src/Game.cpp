@@ -50,9 +50,16 @@ bool Game::init()
 	}
 
 	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", renderer });
-	if (!bg->isEmpty())
+	if (!ship->isEmpty())
 	{
 		std::cout << "Ship ERRoR: \n" << std::endl;
+		return false;
+	}
+
+	arrow = std::unique_ptr<Arrow>(new Arrow{ "data/arrow.tga", renderer });
+	if (!arrow->isEmpty())
+	{
+		std::cout << "Arrow ERRoR: \n" << std::endl;
 		return false;
 	}
 
@@ -69,9 +76,8 @@ void Game::render()
 	SDL_RenderClear(renderer);
 	
 	bg->render();
+	arrow->render();
 	ship->render();
-
-
 	SDL_RenderPresent(renderer);
 }
 
@@ -83,7 +89,15 @@ void Game::pollEventWindow()
 		if (e.type == SDL_QUIT)
 			quit = true;
 		ship->PoolEvent(e);
+		arrow->PoolEvent(e);
 	}
+	
+
+	
+}
+void Game::showCursor(bool bShow)
+{
+	SDL_ShowCursor(bShow ? 1 : 0);
 }
 
 void Game::run()

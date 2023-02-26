@@ -53,8 +53,8 @@ Particle::Particle(float x, float y, float side, float angle, SDL_Renderer* rend
 	}
 
 	// Визначення позиції вогню
-	int fireX = x;
-	int fireY = y - side / 2;
+	float fireX = x;
+	float fireY = y - side / 2;
 
 	float angleInRadians = angle * M_PI / 180.0;
 	// Обертання корабля навколо своїх координат

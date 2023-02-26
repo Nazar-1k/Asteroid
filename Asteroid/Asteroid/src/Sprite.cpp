@@ -134,6 +134,15 @@ void Sprite::setHeight(int h)
 	this->height = h;
 }
 
+float Sprite::setX(float x)
+{
+	return this->x = x;
+}
+float Sprite::setY(float y)
+{
+	return this->y = y;
+}
+
 void Sprite::free()
 {
 	if (texture)
