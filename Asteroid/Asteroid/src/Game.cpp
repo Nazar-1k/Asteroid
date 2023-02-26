@@ -62,6 +62,13 @@ bool Game::init()
 		std::cout << "Arrow ERRoR: \n" << std::endl;
 		return false;
 	}
+	bigAsteroid = std::unique_ptr<Asteroid>(new Asteroid{ "data/big_asteroid.png", renderer });
+	if (!bigAsteroid->isEmpty())
+	{
+		std::cout << "BigAsteroid ERRoR: \n" << std::endl;
+		return false;
+	}
+
 
 	showCursor(false);
 
@@ -70,7 +77,8 @@ bool Game::init()
 
 void Game::update()
 {
-	ship->move(SCREEN_WIDTH, SCREEN_HEIGHT);
+	ship->move();
+	bigAsteroid->move();
 }
 
 void Game::render()
@@ -79,6 +87,7 @@ void Game::render()
 	
 	bg->render();
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
+	bigAsteroid->render();
 	ship->render();
 	SDL_RenderPresent(renderer);
 }
@@ -92,6 +101,8 @@ void Game::pollEventWindow()
 			quit = true;
 		ship->PoolEvent(e);
 		arrow->PoolEvent(e);
+		
+
 	}
 }
 void Game::showCursor(bool bShow)

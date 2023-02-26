@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Arrow.cpp" />
+    <ClCompile Include="src\Asteroid.cpp" />
     <ClCompile Include="src\FireParticale.cpp" />
     <ClCompile Include="src\Background.cpp" />
     <ClCompile Include="src\Game.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Asteroid.h" />
     <ClInclude Include="src\Arrow.h" />
     <ClInclude Include="src\FireParticale.h" />
     <ClInclude Include="src\SpaceShip.h" />

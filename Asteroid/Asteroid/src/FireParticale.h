@@ -6,7 +6,7 @@ class Particle
 {
 public:
 	//Initialize position and animation
-	Particle(float x, float y, float side, float angle, SDL_Renderer* renderer);
+	Particle(float x, float y, int side, float angle, SDL_Renderer* renderer);
 	
 
 

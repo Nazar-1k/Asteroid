@@ -5,15 +5,14 @@
 class Ship : public Sprite
 {
 public:
-	Ship();
 	Ship(const char* path, SDL_Renderer* renderer);
 	~Ship();
 	void PoolEvent(SDL_Event& event);
-	void move(int width, int height);
+	void move();
 
-	void render(SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	
-	bool teleport(float& ox, float& oy, int w_scrin, int h_scrin);
+	
 
 private:
 	bool keyUP = false;
