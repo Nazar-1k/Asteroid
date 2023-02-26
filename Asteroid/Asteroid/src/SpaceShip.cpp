@@ -5,8 +5,8 @@ static Mix_Chunk* fireSound = nullptr;
 Ship::Ship(const char* path, SDL_Renderer* renderer)
     : Sprite(path, renderer)
 {
-    x = 0;
-    y = 0;
+    x = 600;
+    y = 300;
 
     //Initialize particles
     for (int i = 0; i < TOTAL_PARTICLES; ++i)

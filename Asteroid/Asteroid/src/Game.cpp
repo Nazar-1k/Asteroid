@@ -62,13 +62,28 @@ bool Game::init()
 		std::cout << "Arrow ERRoR: \n" << std::endl;
 		return false;
 	}
-	bigAsteroid = std::unique_ptr<Asteroid>(new Asteroid{ "data/big_asteroid.png", renderer });
-	if (!bigAsteroid->isEmpty())
-	{
-		std::cout << "BigAsteroid ERRoR: \n" << std::endl;
-		return false;
-	}
 
+	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
+	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
+	/*bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ "data/big_asteroid.png", renderer }));*/
+
+	
+	for (auto &asteroid : bigAsteroids)
+		if (!asteroid->isEmpty())
+		{
+			return false;
+		}
+
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+
+	for (auto& asteroid : smallAsteroids)
+		if (!asteroid->isEmpty())
+		{
+			return false;
+		}
 
 	showCursor(false);
 
@@ -78,7 +93,52 @@ bool Game::init()
 void Game::update()
 {
 	ship->move();
-	bigAsteroid->move();
+
+	for (auto& asteroid : bigAsteroids)
+	{
+		asteroid->move();
+	}
+
+	for (auto& asteroid : smallAsteroids)
+	{
+		asteroid->move();
+	}
+
+	for (auto& asteroid1 : bigAsteroids)
+	{
+		for (auto& asteroid2 : bigAsteroids)
+		{
+			if (asteroid1 != asteroid2 and Asteroid::checkColition(*asteroid1, *asteroid2))
+			{
+				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
+			}
+		}
+		
+	}
+	
+	for (auto& asteroid1 : smallAsteroids)
+	{
+		for (auto& asteroid2 : smallAsteroids)
+		{
+			if (asteroid1 != asteroid2 and Asteroid::checkColition(*asteroid1, *asteroid2))
+			{
+				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
+			}
+		}
+	}
+
+	for (auto& asteroid1 : bigAsteroids)
+	{
+		for (auto& asteroid2 : smallAsteroids)
+		{
+			if (Asteroid::checkColition(*asteroid1, *asteroid2))
+			{
+				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
+			}
+		}
+	}
+
+
 }
 
 void Game::render()
@@ -86,9 +146,20 @@ void Game::render()
 	SDL_RenderClear(renderer);
 	
 	bg->render();
-	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
-	bigAsteroid->render();
+
+	for (auto& asteroid : bigAsteroids)
+	{
+		asteroid->render();
+	}
+
+	for (auto& asteroid : smallAsteroids)
+	{
+		asteroid->render();
+	}
+	
 	ship->render();
+
+	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_RenderPresent(renderer);
 }
 
@@ -105,6 +176,7 @@ void Game::pollEventWindow()
 
 	}
 }
+
 void Game::showCursor(bool bShow)
 {
 	SDL_ShowCursor(bShow ? 1 : 0);
@@ -118,7 +190,6 @@ void Game::run()
 	}
 	else
 	{
-		
 		while (!quit)
 		{
 			fpsTimer.start();

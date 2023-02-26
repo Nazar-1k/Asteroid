@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Arrow.h"
 #include "Asteroid.h"
+#include <vector>
 
 
 class Game
@@ -22,7 +23,6 @@ public:
 	void close();
 
 	void showCursor(bool bShow);
-	void onMouseMove();
 
 	void run();
 
@@ -52,7 +52,8 @@ private:
 	std::unique_ptr<BG> bg;
 	std::unique_ptr<Ship> ship;
 	std::unique_ptr<Arrow> arrow;
-	std::unique_ptr<Asteroid> bigAsteroid;
+	std::vector<std::unique_ptr<Asteroid>> bigAsteroids;
+	std::vector<std::unique_ptr<Asteroid>> smallAsteroids;
 
 #pragma endregion
 };
