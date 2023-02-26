@@ -81,7 +81,7 @@ void Ship::PoolEvent(SDL_Event& e)
     }
 }
 
-void Ship::move(int width_S , int height_S)
+void Ship::move()
 {
     #pragma region moveShip
     if (keyUP == true)
@@ -126,7 +126,7 @@ void Ship::move(int width_S , int height_S)
 
 }
 
-void Ship::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
 {
     angle = this->angle;
     //Set rendering space and render to screen
@@ -159,43 +159,6 @@ void Ship::render(SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererF
    
     renderParticles();
    
-}
-
-
-
-bool Ship::teleport(float& ox, float& oy, int w_scrin, int h_scrin)
-{
-    bool isteleport = false;
-    ox = x;
-    oy = y;
-    if (y - height / 2 < 0.0f)
-    {
-        oy = y + h_scrin;
-         
-        isteleport = true;
-    }
-
-    if (y + height / 2 >= h_scrin)
-    {
-        oy = y - h_scrin;
-      
-        isteleport = true;
-    }
-
-    if (x - width / 2 < 0.0f)
-    {
-        ox = x + w_scrin;
-      
-        isteleport =  true;
-    }
-    if (x + width / 2 >= w_scrin)
-    {
-        ox = x - w_scrin;
-        isteleport = true;
-    }
-    x = ox;
-    y = oy;
-    return isteleport;
 }
 
 void Ship::renderParticles()

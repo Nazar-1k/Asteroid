@@ -5,6 +5,7 @@
 #include "Background.h"
 #include "Timer.h"
 #include "Arrow.h"
+#include "Asteroid.h"
 
 
 class Game
@@ -51,6 +52,7 @@ private:
 	std::unique_ptr<BG> bg;
 	std::unique_ptr<Ship> ship;
 	std::unique_ptr<Arrow> arrow;
+	std::unique_ptr<Asteroid> bigAsteroid;
 
 #pragma endregion
 };

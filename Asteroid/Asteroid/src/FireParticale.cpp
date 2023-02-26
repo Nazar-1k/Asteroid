@@ -7,7 +7,7 @@ static Sprite OrangeTexture;
 static Sprite GreyTexture;
 static Sprite ShimmerTexture;
 
-Particle::Particle(float x, float y, float side, float angle, SDL_Renderer* renderer)
+Particle::Particle(float x, float y, int side, float angle, SDL_Renderer* renderer)
 	:dead(false)
 {
 	if (!texture_is_load)
