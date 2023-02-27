@@ -6,9 +6,9 @@ Asteroid::Asteroid(float mass, const char* path, SDL_Renderer* renderer)
 {
 	dx =  static_cast<float>(sin(rand() % 361 * 3.14159 / 180) * velocity);
 	dy = static_cast<float>(-cos(rand() % 361 * 3.14159 / 180) * velocity);
-    x = rand() % 361;
-    y = rand() % 361;
-    radius = width / 2;
+    x = static_cast<float>(rand() % 361);
+    y = static_cast<float>(rand() % 361);
+    radius = static_cast<float>(width / 2);
     
 
     if (!this->isEmpty())
@@ -125,9 +125,11 @@ void Asteroid::reflectingAsteroids(Asteroid& asteroid1, Asteroid& asteroid2)
     float moveX = overlap * cos(angle);
     float moveY = overlap * sin(angle);
 
-    asteroid1.setX(asteroid1.getX() + moveX / 2);
-    asteroid1.setY(asteroid1.getY() + moveY / 2);
+    asteroid1.x = asteroid1.x + moveX / 2;
+    asteroid1.y = asteroid1.y + moveY / 2;
 
-    asteroid2.setX(asteroid2.getX() - moveX / 2);
-    asteroid2.setY(asteroid2.getY() - moveY / 2);
+    asteroid2.x = asteroid2.x - moveX / 2;
+    asteroid2.y = asteroid2.y - moveY / 2;
 }
+
+

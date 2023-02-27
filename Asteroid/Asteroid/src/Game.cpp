@@ -84,6 +84,10 @@ bool Game::init()
 		{
 			return false;
 		}
+	
+	
+	
+
 
 	showCursor(false);
 
@@ -92,16 +96,34 @@ bool Game::init()
 
 void Game::update()
 {
+
 	ship->move();
 
 	for (auto& asteroid : bigAsteroids)
 	{
 		asteroid->move();
+		if (ship->colideAsteroid(*asteroid))
+		{
+			ship->setColor(0, 0, 0);
+		}
+		/*else
+		{
+			ship->setColor(200,200, 200);
+		}*/
+		
 	}
 
 	for (auto& asteroid : smallAsteroids)
 	{
 		asteroid->move();
+		if (ship->colideAsteroid(*asteroid))
+		{
+			ship->setColor(0, 0, 0);
+		}
+		/*else
+		{
+			ship->setColor(200, 200, 200);
+		}*/
 	}
 
 	for (auto& asteroid1 : bigAsteroids)

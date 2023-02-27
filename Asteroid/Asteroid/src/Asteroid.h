@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sprite.h"
+#include "SpaceShip.h"
 
 class Asteroid : public Sprite
 {
@@ -15,13 +16,16 @@ public:
 
 	static bool checkColition(Asteroid& asteroid1, Asteroid& asteroid2);
 	static void reflectingAsteroids(Asteroid& asteroid1, Asteroid& asteroid2);
+
+	friend bool Ship::colideAsteroid(Asteroid& ast);
+	/*friend bool Bullet::checkColition(Asteroid& asteroid);*/
 private:
 	float dx, dy;
 
 	float mass;
 
 	const float velocity = 2;
-	const float maxVelocity = 5;
+	const float maxVelocity = 4;
 
 	float radius;
 	bool to_be_deleted;
@@ -29,7 +33,7 @@ private:
 	//rotation left or right
 	bool b_rotation;
 
-	double speedrotation;
+	float speedrotation;
 
 	////Particle count
 	//static const int TOTAL_PARTICLES = 20;

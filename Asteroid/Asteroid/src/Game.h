@@ -1,11 +1,12 @@
 #pragma once
 
 #include <iostream>
-#include "SpaceShip.h"
+//#include "SpaceShip.h"
 #include "Background.h"
 #include "Timer.h"
 #include "Arrow.h"
 #include "Asteroid.h"
+#include "Bullet.h"
 #include <vector>
 
 
@@ -54,6 +55,8 @@ private:
 	std::unique_ptr<Arrow> arrow;
 	std::vector<std::unique_ptr<Asteroid>> bigAsteroids;
 	std::vector<std::unique_ptr<Asteroid>> smallAsteroids;
+	std::vector<std::unique_ptr<Bullet>> bullets;
+
 
 #pragma endregion
 };

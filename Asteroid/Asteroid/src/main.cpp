@@ -2,7 +2,7 @@
 
 int main(int argc, char* args[])
 {
-	srand(time(NULL));
+	srand(static_cast<int>(time(NULL)));
 	Game game;
 	game.run();
 	

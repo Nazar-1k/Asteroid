@@ -1,4 +1,5 @@
 #include "SpaceShip.h"
+#include "Asteroid.h"
 
 static Mix_Chunk* fireSound = nullptr;
 
@@ -161,6 +162,7 @@ void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFl
    
 }
 
+
 void Ship::renderParticles()
 {
     if (keyUP)
@@ -191,4 +193,10 @@ void Ship::renderParticles()
     }
 }
 
+bool Ship::colideAsteroid(Asteroid& ast)
+{
+    float fx = ast.x - x;
+    float fy = ast.y - y;
 
+    return  std::sqrt(fx * fx + fy * fy) <= ast.radius + width / 2;
+}
