@@ -65,7 +65,8 @@ bool Game::init()
 
 	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
 	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
-	/*bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ "data/big_asteroid.png", renderer }));*/
+	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
+	
 
 	
 	for (auto &asteroid : bigAsteroids)
@@ -78,6 +79,8 @@ bool Game::init()
 	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
 	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
 	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+	
+	
 
 	for (auto& asteroid : smallAsteroids)
 		if (!asteroid->isEmpty())
@@ -85,9 +88,11 @@ bool Game::init()
 			return false;
 		}
 	
-	
-	
-
+	for (auto& bullet : bullets)
+		if (!bullet->isEmpty())
+		{
+			return false;
+		}
 
 	showCursor(false);
 
@@ -106,11 +111,6 @@ void Game::update()
 		{
 			ship->setColor(0, 0, 0);
 		}
-		/*else
-		{
-			ship->setColor(200,200, 200);
-		}*/
-		
 	}
 
 	for (auto& asteroid : smallAsteroids)
@@ -120,10 +120,6 @@ void Game::update()
 		{
 			ship->setColor(0, 0, 0);
 		}
-		/*else
-		{
-			ship->setColor(200, 200, 200);
-		}*/
 	}
 
 	for (auto& asteroid1 : bigAsteroids)
@@ -177,6 +173,11 @@ void Game::render()
 	for (auto& asteroid : smallAsteroids)
 	{
 		asteroid->render();
+	}
+
+	for (auto& bulet : bullets)
+	{
+		bulet->render();
 	}
 	
 	ship->render();
