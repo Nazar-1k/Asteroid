@@ -2,8 +2,11 @@
 
 #include "FireParticale.h"
 #include <SDL_mixer.h>
+#include "Bullet.h"
 
 class Asteroid;
+class Arrow;
+
 
 class Ship : public Sprite
 {
@@ -16,6 +19,9 @@ public:
 	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	
 	bool colideAsteroid(Asteroid& ast);
+
+	
+	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
 
 private:
 	bool keyUP = false;

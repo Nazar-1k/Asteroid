@@ -109,12 +109,12 @@ void Asteroid::reflectingAsteroids(Asteroid& asteroid1, Asteroid& asteroid2)
     float newDirection1 = direction1 - angle;
     float newDirection2 = direction2 - angle;
 
-    asteroid1.dx = newVelocity1 * cos(newDirection1) + velocity1 * sin(direction1 - angle) * cos(angle + M_PI / 2);
-    asteroid1.dy = newVelocity1 * sin(newDirection1) + velocity1 * sin(direction1 - angle) * sin(angle + M_PI / 2);
+    asteroid1.dx = static_cast<float>(newVelocity1 * cos(newDirection1) + velocity1 * sin(direction1 - angle) * cos(angle + M_PI / 2));
+    asteroid1.dy = static_cast<float>(newVelocity1 * sin(newDirection1) + velocity1 * sin(direction1 - angle) * sin(angle + M_PI / 2));
 
-    asteroid2.dx = newVelocity2 * cos(newDirection2) + velocity2 * sin(direction2 - angle) * cos(angle + M_PI / 2);
-    asteroid2.dy = newVelocity2 * sin(newDirection2) + velocity2 * sin(direction2 - angle) * sin(angle + M_PI / 2);
-
+    asteroid2.dx = static_cast<float>(newVelocity2 * cos(newDirection2) + velocity2 * sin(direction2 - angle) * cos(angle + M_PI / 2));
+    asteroid2.dy = static_cast<float>(newVelocity2 * sin(newDirection2) + velocity2 * sin(direction2 - angle) * sin(angle + M_PI / 2));
+                                                                                                                                     
     float fx = asteroid1.x - asteroid2.x;
     float fy = asteroid1.y - asteroid2.y;
 

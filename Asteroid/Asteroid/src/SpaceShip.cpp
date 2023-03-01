@@ -87,8 +87,8 @@ void Ship::move()
     #pragma region moveShip
     if (keyUP == true)
     {
-        dx += sin(angle * 3.14159 / 180) * velocity / 10;
-        dy += -cos(angle * 3.14159 / 180) * velocity / 10;
+        dx += static_cast<float>(sin(angle * 3.14159 / 180) * velocity / 10);
+        dy += static_cast<float>(-cos(angle * 3.14159 / 180) * velocity / 10);
         Mix_PlayChannel(-1, fireSound, 0);
     }
       /*  dy -= velocity;*/

@@ -18,7 +18,8 @@ public:
 	static void reflectingAsteroids(Asteroid& asteroid1, Asteroid& asteroid2);
 
 	friend bool Ship::colideAsteroid(Asteroid& ast);
-	/*friend bool Bullet::checkColition(Asteroid& asteroid);*/
+	friend bool Bullet::colideAsteroid(Asteroid& ast);
+
 private:
 	float dx, dy;
 

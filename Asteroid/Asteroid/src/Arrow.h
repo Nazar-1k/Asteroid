@@ -1,5 +1,8 @@
 #pragma once
 #include "Sprite.h"
+#include "Bullet.h"
+
+class Ship;
 
 class Arrow : public Sprite
 {
@@ -11,4 +14,5 @@ public:
 
 	void render(int width_s, int height_s);
 
+	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
 };

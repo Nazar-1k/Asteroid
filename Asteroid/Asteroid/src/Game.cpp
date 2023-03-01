@@ -104,24 +104,54 @@ void Game::update()
 
 	ship->move();
 
+	#pragma region Asteroids
+
+	//BIG Asteroid
 	for (auto& asteroid : bigAsteroids)
 	{
 		asteroid->move();
+		#pragma region colideBigAsteroid__SHIP
+
 		if (ship->colideAsteroid(*asteroid))
 		{
 			ship->setColor(0, 0, 0);
 		}
+		#pragma endregion
+
+		#pragma region colideBigAsteroid__Bullet
+		for (auto& bullet : bullets)
+		{
+			if (bullet->colideAsteroid(*asteroid))
+			{
+				bullet->destroy();
+			}
+		}
+		#pragma endregion
 	}
 
+	//Small Asteroid
 	for (auto& asteroid : smallAsteroids)
 	{
 		asteroid->move();
+		#pragma region colideSmallAsteroid__SHIP
 		if (ship->colideAsteroid(*asteroid))
 		{
 			ship->setColor(0, 0, 0);
 		}
+		#pragma endregion
+
+		#pragma region colideSmallAsteroid__Bullet
+		for (auto& bullet : bullets)
+		{
+			if (bullet->colideAsteroid(*asteroid))
+			{
+				bullet->destroy();
+			}
+		}
+		#pragma endregion
 	}
 
+	#pragma region Colide-BigAsteroid__BigAsteroid
 	for (auto& asteroid1 : bigAsteroids)
 	{
 		for (auto& asteroid2 : bigAsteroids)
@@ -131,9 +161,10 @@ void Game::update()
 				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
 			}
 		}
-		
 	}
-	
+	#pragma endregion
+
+	#pragma region Colide-SmallAsteroid__SmallAsteroid
 	for (auto& asteroid1 : smallAsteroids)
 	{
 		for (auto& asteroid2 : smallAsteroids)
@@ -144,7 +175,9 @@ void Game::update()
 			}
 		}
 	}
+	#pragma endregion
 
+	#pragma region Colide-BigAsteroid__SmallAsteroid
 	for (auto& asteroid1 : bigAsteroids)
 	{
 		for (auto& asteroid2 : smallAsteroids)
@@ -154,6 +187,14 @@ void Game::update()
 				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
 			}
 		}
+	}
+	#pragma endregion
+
+	#pragma endregion
+
+	for (auto& bullet : bullets)
+	{
+		bullet->move(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 
 
@@ -174,10 +215,15 @@ void Game::render()
 	{
 		asteroid->render();
 	}
-
-	for (auto& bulet : bullets)
+	
+	
+	for (size_t i = 0; i < bullets.size(); i++)
 	{
-		bulet->render();
+		if (bullets[i]->isActive()) 
+			bullets[i]->render();
+		else
+			bullets.erase(bullets.begin() + i);
+	
 	}
 	
 	ship->render();
@@ -195,6 +241,13 @@ void Game::pollEventWindow()
 			quit = true;
 		ship->PoolEvent(e);
 		arrow->PoolEvent(e);
+		if (e.type == SDL_MOUSEBUTTONDOWN)
+		{
+			if (e.button.button == SDL_BUTTON_LEFT) 
+			{
+				bullets.push_back(std::unique_ptr<Bullet>(new Bullet{"data/bullet.png", renderer, *ship, *arrow}));
+			}
+		}
 		
 
 	}
@@ -221,7 +274,7 @@ void Game::run()
 			update();
 			render();
 
-			if (frameDelay > fpsTimer.getTicks())
+			if (frameDelay > static_cast<int>(fpsTimer.getTicks()))
 			{
 				//Wait remaining time
 				SDL_Delay(frameDelay - fpsTimer.getTicks());
