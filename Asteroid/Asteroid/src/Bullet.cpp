@@ -23,7 +23,6 @@ void Bullet::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_Renderer
     {
         angle = this->angle;
 
-        this->angle = angle;
         //Set rendering space and render to screen
         SDL_Rect renderQuad = { static_cast<int>(x),  static_cast<int>(y), width / 20, height / 20 };
 
@@ -33,20 +32,6 @@ void Bullet::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_Renderer
             renderQuad.w = clip->w;
             renderQuad.h = clip->h;
         }
-
-        //float fx, fy;
-        //if (teleport(fx, fy, 1000, 600))
-        //{
-
-        //    SDL_Rect renderQuad2 = { static_cast<int>(fx - width / 2),  static_cast<int>(fy - height / 2), width / 20, height / 20 };
-        //    if (clip != NULL)
-        //    {
-        //        renderQuad2.w = clip->w;
-        //        renderQuad2.h = clip->h;
-        //    }
-        //    //Render to screen   
-        //    SDL_RenderCopyEx(renderer, texture, clip, &renderQuad2, angle, center, SDL_FLIP_HORIZONTAL);
-        //}
 
         //Render to screen
         SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);

@@ -8,7 +8,6 @@ class Arrow;
 class Bullet : public Sprite
 {
 public:
-	Bullet(const char* path, SDL_Renderer* renderer) {}
 	Bullet(const char* path, SDL_Renderer* renderer, Ship& ship, Arrow& arrow);
 	~Bullet() {  }
 

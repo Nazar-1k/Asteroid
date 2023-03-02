@@ -1,5 +1,6 @@
 #include "Asteroid.h"
 #include <cmath>
+
 Asteroid::Asteroid(float mass, const char* path, SDL_Renderer* renderer)
     : Sprite(path, renderer), to_be_deleted(false), mass(mass),
     speedrotation(static_cast<float>((rand() % (999 - 100) + 100) / static_cast<float>(1000)))
@@ -16,33 +17,43 @@ Asteroid::Asteroid(float mass, const char* path, SDL_Renderer* renderer)
         std::cout << "Asteroid ERRoR: \n" << std::endl;
     }
     b_rotation = rand() % 2;
+
 }
 
+Asteroid::~Asteroid()
+{
+
+}
 
 void Asteroid::move()
 {
-    x += dx;
-    y += dy;
+    if (!to_be_deleted)
+    {
+        x += dx;
+        y += dy;
 
-    if (dx >= maxVelocity)
-        dx = maxVelocity;
-    else if (dx <= -maxVelocity)
-        dx = -maxVelocity;
+        if (dx >= maxVelocity)
+            dx = maxVelocity;
+        else if (dx <= -maxVelocity)
+            dx = -maxVelocity;
 
-    if (dy >= maxVelocity)
-        dy = maxVelocity;
-    else if (dy <= -maxVelocity)
-        dy = -maxVelocity;
+        if (dy >= maxVelocity)
+            dy = maxVelocity;
+        else if (dy <= -maxVelocity)
+            dy = -maxVelocity;
 
-    if (b_rotation)
-        angle += speedrotation;
-    else
-        angle -= speedrotation;
+        if (b_rotation)
+            angle += speedrotation;
+        else
+            angle -= speedrotation;
+    }
+  
 }
 
 void Asteroid::deleteAsteroid()
 {
     to_be_deleted = true;
+
 }
 
 void Asteroid::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
@@ -78,7 +89,6 @@ void Asteroid::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_Render
         //Render to screen
         SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
     }
-
     
 }
 

@@ -1,4 +1,4 @@
-#include "FireParticale.h"
+#include "Particale.h"
 
 static bool texture_is_load{ false };
 
@@ -73,6 +73,63 @@ Particle::Particle(float x, float y, int side, float angle, SDL_Renderer* render
     }
 }
 
+Particle::Particle(float x, float y,int side, SDL_Renderer* renderer)
+	:dead(false)
+{
+	if (!texture_is_load)
+	{
+		RedTexture.setRenderer(renderer);
+		OrangeTexture.setRenderer(renderer);
+		GreyTexture.setRenderer(renderer);
+		ShimmerTexture.setRenderer(renderer);
+		//Load red texture
+		if (!RedTexture.loadFromFile("data/red.png"))
+		{
+			printf("Failed to load red texture!\n");
+		}
+
+		//Load green texture
+		if (!OrangeTexture.loadFromFile("data/orange.png"))
+		{
+			printf("Failed to load green texture!\n");
+
+		}
+
+		//Load blue texture
+		if (!GreyTexture.loadFromFile("data/grey.png"))
+		{
+			printf("Failed to load blue texture!\n");
+
+		}
+
+		//Load shimmer texture
+		if (!ShimmerTexture.loadFromFile("data/shimmer.png"))
+		{
+			printf("Failed to load shimmer texture!\n");
+
+		}
+
+		//Set texture transparency
+		RedTexture.setAlpha(192);
+		OrangeTexture.setAlpha(192);
+		GreyTexture.setAlpha(192);
+		ShimmerTexture.setAlpha(192);
+
+		texture_is_load = true;
+	}
+	this->x = x - side + rand() % side*2;
+	this->y = y - side + rand() % side *2;
+	
+	//Initialize animation
+	Frame = rand() % 5;
+
+	//Set type
+	switch (rand() % 2)
+	{
+	case 0: Texture = &ShimmerTexture; break;
+	case 1: Texture = &GreyTexture; break;
+	}
+}
 
 void Particle::render()
 {

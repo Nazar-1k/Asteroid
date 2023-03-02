@@ -149,7 +149,9 @@
     <ClCompile Include="src\Bullet.cpp" />
     <ClCompile Include="src\Arrow.cpp" />
     <ClCompile Include="src\Asteroid.cpp" />
-    <ClCompile Include="src\FireParticale.cpp" />
+    <ClCompile Include="src\Button.cpp" />
+    <ClCompile Include="src\DestroyParticles.cpp" />
+    <ClCompile Include="src\Particale.cpp" />
     <ClCompile Include="src\Background.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\SpaceShip.cpp" />
@@ -158,10 +160,12 @@
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Button.h" />
+    <ClInclude Include="src\DestroyParticles.h" />
     <ClInclude Include="src\Bullet.h" />
     <ClInclude Include="src\Asteroid.h" />
     <ClInclude Include="src\Arrow.h" />
-    <ClInclude Include="src\FireParticale.h" />
+    <ClInclude Include="src\Particale.h" />
     <ClInclude Include="src\SpaceShip.h" />
     <ClInclude Include="src\Background.h" />
     <ClInclude Include="src\Game.h" />
@@ -170,9 +174,6 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="font\lazy.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

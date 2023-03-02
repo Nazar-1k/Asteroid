@@ -8,11 +8,15 @@ Game::Game()
 
 Game::~Game()
 {
+
 	close();
+	
 }
 
 bool Game::init()
 {
+
+
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
@@ -41,67 +45,41 @@ bool Game::init()
 		std::cout << "Renderer could not be created!SDL Error :\n" << SDL_GetError() << std::endl;
 		return false;
 	}
-	//Create BG
-	bg = std::unique_ptr<BG>(new BG{ "data/background.png", renderer });
-	if (!bg->isEmpty())
+
+	if (!initeObject())
 	{
-		std::cout << "BG ERRoR: \n" << std::endl;
 		return false;
 	}
-
-	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", renderer });
-	if (!ship->isEmpty())
-	{
-		std::cout << "Ship ERRoR: \n" << std::endl;
-		return false;
-	}
-
-	arrow = std::unique_ptr<Arrow>(new Arrow{ "data/arrow.tga", renderer });
-	if (!arrow->isEmpty())
-	{
-		std::cout << "Arrow ERRoR: \n" << std::endl;
-		return false;
-	}
-
-	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
-	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
-	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
 	
-
-	
-	for (auto &asteroid : bigAsteroids)
-		if (!asteroid->isEmpty())
-		{
-			return false;
-		}
-
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
-	
-	
-
-	for (auto& asteroid : smallAsteroids)
-		if (!asteroid->isEmpty())
-		{
-			return false;
-		}
-	
-	for (auto& bullet : bullets)
-		if (!bullet->isEmpty())
-		{
-			return false;
-		}
-
 	showCursor(false);
+
+
+	// Initialize SDL_ttf
+	TTF_Init();
+
+	// Create a font
+	TTF_Font* font = TTF_OpenFont("font/lazy.ttf", 24);
+
+	// Create a Button object using a unique_ptr
+	button = std::unique_ptr<Button>(new Button(renderer, font, "Click me!", { 100, 100, 200, 50 }));
+
+	// Set the button's position
+	button->setPosition(200, 200);
+
+	// Set the button's text color
+	button->setTextColor({ 255, 255, 255, 255 });
+
+	// Set the button's rectangle color
+	button->setRectColor({ 0, 0, 0, 255 });
+
+	
+
 
 	return true;
 }
 
 void Game::update()
 {
-
 	ship->move();
 
 	#pragma region Asteroids
@@ -133,19 +111,21 @@ void Game::update()
 	for (auto& asteroid : smallAsteroids)
 	{
 		asteroid->move();
-		#pragma region colideSmallAsteroid__SHIP
+		#pragma region colide_SHIP
 		if (ship->colideAsteroid(*asteroid))
 		{
 			ship->setColor(0, 0, 0);
 		}
 		#pragma endregion
 
-		#pragma region colideSmallAsteroid__Bullet
+		#pragma region colide__Bullet
 		for (auto& bullet : bullets)
 		{
 			if (bullet->colideAsteroid(*asteroid))
 			{
 				bullet->destroy();
+				destroy_particle.push_back( std::unique_ptr<DestroyParticles>( new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth(), renderer }));
+				asteroid->deleteAsteroid();
 			}
 		}
 		#pragma endregion
@@ -196,8 +176,6 @@ void Game::update()
 	{
 		bullet->move(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
-
-
 }
 
 void Game::render()
@@ -206,16 +184,38 @@ void Game::render()
 	
 	bg->render();
 
-	for (auto& asteroid : bigAsteroids)
+	if (!destroy_particle.empty())
 	{
-		asteroid->render();
-	}
-
-	for (auto& asteroid : smallAsteroids)
-	{
-		asteroid->render();
+		for (size_t i = 0; i < destroy_particle.size(); i++)
+		{
+				destroy_particle[i]->render();
+			if (destroy_particle[i]->getOut())
+			{
+				destroy_particle.erase(destroy_particle.begin() + i);
+			}
+			
+		}
 	}
 	
+
+	for (size_t i = 0; i < smallAsteroids.size(); i++)
+	{
+		if (!smallAsteroids[i]->isActive())
+			smallAsteroids[i]->render();
+		else
+		{
+		
+			smallAsteroids.erase(smallAsteroids.begin() + i);
+		}
+	}
+
+	for (size_t i = 0; i < bigAsteroids.size(); i++)
+	{
+		if (!bigAsteroids[i]->isActive())
+			bigAsteroids[i]->render();
+		else
+			bigAsteroids.erase(bigAsteroids.begin() + i);
+	}
 	
 	for (size_t i = 0; i < bullets.size(); i++)
 	{
@@ -223,12 +223,13 @@ void Game::render()
 			bullets[i]->render();
 		else
 			bullets.erase(bullets.begin() + i);
-	
 	}
 	
 	ship->render();
 
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
+	if(button)
+		button->draw();
 	SDL_RenderPresent(renderer);
 }
 
@@ -246,10 +247,23 @@ void Game::pollEventWindow()
 			if (e.button.button == SDL_BUTTON_LEFT) 
 			{
 				bullets.push_back(std::unique_ptr<Bullet>(new Bullet{"data/bullet.png", renderer, *ship, *arrow}));
+				
+			}			
+		}
+		if (e.type == SDL_MOUSEMOTION)
+		{
+			// Check if the mouse is over the button and set its hovered state accordingly
+			if (button->isMouseOver(arrow->getX(), arrow->getY()))
+			{
+				button->setHovered(true);
+				
+			}
+			else
+			{
+				button->setHovered(false);
+				
 			}
 		}
-		
-
 	}
 }
 
@@ -260,7 +274,7 @@ void Game::showCursor(bool bShow)
 
 void Game::run()
 {	
-	if (!init())
+	if (!init() and !init())
 	{
 		std::cout<<"Failed to initialize!\n"<<std::endl;
 	}
@@ -297,4 +311,64 @@ void Game::close()
 	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
+}
+
+bool Game::initeObject()
+{
+	bg = std::unique_ptr<BG>(new BG{ "data/background.png", renderer });
+	if (!bg->isEmpty())
+	{
+		std::cout << "BG ERRoR: \n" << std::endl;
+		return false;
+	}
+
+	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", renderer });
+	if (!ship->isEmpty())
+	{
+		std::cout << "Ship ERRoR: \n" << std::endl;
+		return false;
+	}
+
+	arrow = std::unique_ptr<Arrow>(new Arrow{ "data/arrow.tga", renderer });
+	if (!arrow->isEmpty())
+	{
+		std::cout << "Arrow ERRoR: \n" << std::endl;
+		return false;
+	}
+
+	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
+	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
+	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, "data/big_asteroid.png", renderer }));
+
+	for (auto& asteroid : bigAsteroids)
+		if (!asteroid->isEmpty())
+		{
+			return false;
+		}
+
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, "data/small_asteroid.png", renderer }));
+
+	for (auto& asteroid : smallAsteroids)
+		if (!asteroid->isEmpty())
+		{
+			return false;
+		}
+
+	for (auto& bullet : bullets)
+		if (!bullet->isEmpty())
+		{
+			return false;
+		}
+	return true;
+}
+
+void Game::deleteObject()
+{
+	bigAsteroids.clear();
+	smallAsteroids.clear();
+	bullets.clear();
+
 }

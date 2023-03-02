@@ -7,6 +7,8 @@
 #include "Arrow.h"
 #include "Asteroid.h"
 #include "Bullet.h"
+#include "DestroyParticles.h"
+#include "Button.h"
 #include <vector>
 
 
@@ -29,6 +31,9 @@ public:
 
 
 private:
+	bool initeObject();
+	void deleteObject();
+
 #pragma region Window
 	
 	int SCREEN_WIDTH;
@@ -56,8 +61,13 @@ private:
 	std::vector<std::unique_ptr<Asteroid>> bigAsteroids;
 	std::vector<std::unique_ptr<Asteroid>> smallAsteroids;
 	std::vector<std::unique_ptr<Bullet>> bullets;
-
+	std::vector<std::unique_ptr<DestroyParticles>> destroy_particle;
 
 #pragma endregion
+
+	std::unique_ptr<Button> button;
+	
+
+
 };
 

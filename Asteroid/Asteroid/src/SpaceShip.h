@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FireParticale.h"
+#include "Particale.h"
 #include <SDL_mixer.h>
 #include "Bullet.h"
 
@@ -17,7 +17,7 @@ public:
 	void move();
 
 	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
-	
+	void destroy() { is_active = false; }
 	bool colideAsteroid(Asteroid& ast);
 
 	
@@ -33,6 +33,8 @@ private:
 	const float maxVelocity = 8;
 
 	float dx, dy;
+
+	bool is_active;
 
 	//Particle count
 	static const int TOTAL_PARTICLES = 20;

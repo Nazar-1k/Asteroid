@@ -1,16 +1,17 @@
 #pragma once
 
-#include "Sprite.h"
 #include "SpaceShip.h"
 
 class Asteroid : public Sprite
 {
 public:
 	Asteroid(float mass, const char* path, SDL_Renderer* renderer);
-	~Asteroid() { }
+	~Asteroid();
 
 	void move();
 	void deleteAsteroid();
+	bool isActive() { return to_be_deleted; }
+
 
 	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
@@ -35,13 +36,5 @@ private:
 	bool b_rotation;
 
 	float speedrotation;
-
-	////Particle count
-	//static const int TOTAL_PARTICLES = 20;
-	////The particles
-	//Particle* particles[TOTAL_PARTICLES];
-
-	////Shows the particles
-	//void renderParticles();
-
+	
 };
