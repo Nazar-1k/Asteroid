@@ -10,12 +10,10 @@ public:
 
 	Particle(float x, float y, int side, SDL_Renderer* renderer);
 	
-
-
 	//Shows the particle
 	void render();
 	//Checks if particle is dead
-	bool isDead();
+	bool isDead() const { return dead; }
 	void setdead(bool dead);
 
 	//Offsets

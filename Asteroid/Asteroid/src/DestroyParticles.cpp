@@ -20,7 +20,7 @@ DestroyParticles::~DestroyParticles()
 	}
 }
 
-void DestroyParticles::render()
+void DestroyParticles::render() 
 {
     if (!out)
     {
@@ -54,8 +54,4 @@ void DestroyParticles::render()
             out = true;
         }
     }
-}
-bool DestroyParticles::getOut()
-{
-    return out;
 }

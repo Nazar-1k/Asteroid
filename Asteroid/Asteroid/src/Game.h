@@ -1,9 +1,7 @@
 #pragma once
 
 #include <iostream>
-//#include "SpaceShip.h"
 #include "Background.h"
-#include "Timer.h"
 #include "Arrow.h"
 #include "Asteroid.h"
 #include "Bullet.h"
@@ -31,10 +29,12 @@ public:
 
 
 private:
+	bool initWindow();
 	bool initeObject();
+	bool initButton();
 	void deleteObject();
 
-#pragma region Window
+	#pragma region Window
 	
 	int SCREEN_WIDTH;
 	int SCREEN_HEIGHT;
@@ -52,8 +52,9 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
-#pragma endregion
-#pragma region Sprites
+	#pragma endregion
+
+	#pragma region Sprites
 
 	std::unique_ptr<BG> bg;
 	std::unique_ptr<Ship> ship;
@@ -63,9 +64,13 @@ private:
 	std::vector<std::unique_ptr<Bullet>> bullets;
 	std::vector<std::unique_ptr<DestroyParticles>> destroy_particle;
 
-#pragma endregion
+	#pragma endregion
+
+	#pragma region Main_menu
 
 	std::unique_ptr<Button> button;
+
+	#pragma endregion
 	
 
 

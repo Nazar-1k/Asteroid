@@ -89,7 +89,6 @@ void Asteroid::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_Render
         //Render to screen
         SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
     }
-    
 }
 
 bool Asteroid::checkColition(Asteroid& asteroid1, Asteroid& asteroid2)

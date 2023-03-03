@@ -20,7 +20,6 @@ public:
 	void destroy() { is_active = false; }
 	bool colideAsteroid(Asteroid& ast);
 
-	
 	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
 
 private:

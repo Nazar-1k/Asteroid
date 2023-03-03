@@ -8,73 +8,13 @@ Game::Game()
 
 Game::~Game()
 {
-
-	close();
-	
+	close();	
 }
 
 bool Game::init()
 {
-
-
-	//Initialize SDL
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-	{
-		std::cout << "SDL could not initialize!SDL Error :\n" << SDL_GetError() << std::endl;
+	if (!initWindow() or !initeObject() or !initButton())
 		return false;
-	}
-
-	//Create window
-	window = SDL_CreateWindow("Asteroid", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	if (!window)
-	{
-		std::cout << "Window could not be created! SDL Error:\n"<< SDL_GetError()<<std::endl;
-		return false;
-	}
-	//Initialize SDL_mixer
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-	{
-		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError();
-		return  false;
-	}
-	
-	//Create renderer for window
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (!renderer)
-	{
-		std::cout << "Renderer could not be created!SDL Error :\n" << SDL_GetError() << std::endl;
-		return false;
-	}
-
-	if (!initeObject())
-	{
-		return false;
-	}
-	
-	showCursor(false);
-
-
-	// Initialize SDL_ttf
-	TTF_Init();
-
-	// Create a font
-	TTF_Font* font = TTF_OpenFont("font/lazy.ttf", 24);
-
-	// Create a Button object using a unique_ptr
-	button = std::unique_ptr<Button>(new Button(renderer, font, "Click me!", { 100, 100, 200, 50 }));
-
-	// Set the button's position
-	button->setPosition(200, 200);
-
-	// Set the button's text color
-	button->setTextColor({ 255, 255, 255, 255 });
-
-	// Set the button's rectangle color
-	button->setRectColor({ 0, 0, 0, 255 });
-
-	
-
-
 	return true;
 }
 
@@ -247,23 +187,9 @@ void Game::pollEventWindow()
 			if (e.button.button == SDL_BUTTON_LEFT) 
 			{
 				bullets.push_back(std::unique_ptr<Bullet>(new Bullet{"data/bullet.png", renderer, *ship, *arrow}));
-				
 			}			
 		}
-		if (e.type == SDL_MOUSEMOTION)
-		{
-			// Check if the mouse is over the button and set its hovered state accordingly
-			if (button->isMouseOver(arrow->getX(), arrow->getY()))
-			{
-				button->setHovered(true);
-				
-			}
-			else
-			{
-				button->setHovered(false);
-				
-			}
-		}
+		button->handleEvent(e, arrow->getX(), arrow->getY());
 	}
 }
 
@@ -308,13 +234,44 @@ void Game::close()
 	renderer = nullptr;
 
 	//Quit SDL subsystems
+	TTF_Quit();
 	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
 
-bool Game::initeObject()
+bool Game::initWindow()
 {
+	//Initialize SDL
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+	{
+		std::cout << "SDL could not initialize!SDL Error :\n" << SDL_GetError() << std::endl;
+		return false;
+	}
+
+	//Create window
+	window = SDL_CreateWindow("Asteroid", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	if (!window)
+	{
+		std::cout << "Window could not be created! SDL Error:\n" << SDL_GetError() << std::endl;
+		return false;
+	}
+	//Initialize SDL_mixer
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError();
+		return  false;
+	}
+
+	//Create renderer for window
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (!renderer)
+	{
+		std::cout << "Renderer could not be created!SDL Error :\n" << SDL_GetError() << std::endl;
+		return false;
+	}
+
+
 	bg = std::unique_ptr<BG>(new BG{ "data/background.png", renderer });
 	if (!bg->isEmpty())
 	{
@@ -322,17 +279,24 @@ bool Game::initeObject()
 		return false;
 	}
 
-	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", renderer });
-	if (!ship->isEmpty())
-	{
-		std::cout << "Ship ERRoR: \n" << std::endl;
-		return false;
-	}
-
 	arrow = std::unique_ptr<Arrow>(new Arrow{ "data/arrow.tga", renderer });
 	if (!arrow->isEmpty())
 	{
 		std::cout << "Arrow ERRoR: \n" << std::endl;
+		return false;
+	}
+
+	showCursor(false);
+
+	return true;
+}
+
+bool Game::initeObject()
+{
+	ship = std::unique_ptr<Ship>(new Ship{ "data/spaceship.png", renderer });
+	if (!ship->isEmpty())
+	{
+		std::cout << "Ship ERRoR: \n" << std::endl;
 		return false;
 	}
 
@@ -362,6 +326,21 @@ bool Game::initeObject()
 		{
 			return false;
 		}
+
+	return true;
+}
+
+bool Game::initButton()
+{
+	
+#pragma region Text_Asteroid
+
+
+	button = std::unique_ptr<Button>(new Button(renderer, "Click me!", { 100, 100, 200, 50 }));
+	button->setPosition(200, 200);
+	button->setTextColor({ 255, 255, 255, 255 });
+	button->setRectColor({ 63, 74, 92, 255 });
+
 	return true;
 }
 

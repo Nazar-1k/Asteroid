@@ -39,46 +39,47 @@ Ship::~Ship()
 
 void Ship::PoolEvent(SDL_Event& e)
 {
+    switch (e.type)
+    {
     //If a key was press
-    if (e.type == SDL_KEYDOWN)
-    {
-        //Adjust the velocity
-        if (e.key.keysym.sym == SDLK_UP)
+    case SDL_KEYDOWN:
+        switch (e.key.keysym.sym)
         {
+        case SDLK_UP:
             keyUP = true;
-        }
-        if (e.key.keysym.sym == SDLK_DOWN)
-        {
+            break;
+        case SDLK_DOWN:
             keyDown = true;
-        }
-        if (e.key.keysym.sym == SDLK_LEFT)
-        {
+            break;
+        case SDLK_LEFT:
             keyLeft = true;
-        }
-        if (e.key.keysym.sym == SDLK_RIGHT)
-        {
+            break;
+        case SDLK_RIGHT:
             keyRight = true;
+            break;
         }
-    }
+        break;
+
     //If a key was released
-    if (e.type == SDL_KEYUP)
-    {
-        if (e.key.keysym.sym == SDLK_UP)
+    case SDL_KEYUP:
         {
-            keyUP = false;
+            switch (e.key.keysym.sym)
+            {
+            case SDLK_UP:
+                keyUP = false;
+                break;
+            case SDLK_DOWN:
+                keyDown = false;
+                break;
+            case SDLK_LEFT:
+                keyLeft = false;
+                break;
+            case SDLK_RIGHT:
+                keyRight = false;
+                break;
+            }
         }
-        if (e.key.keysym.sym == SDLK_DOWN)
-        {
-            keyDown = false;
-        }
-        if (e.key.keysym.sym == SDLK_LEFT)
-        {
-            keyLeft = false;
-        }
-        if (e.key.keysym.sym == SDLK_RIGHT)
-        {
-            keyRight = false;
-        }
+        break;
     }
 }
 
@@ -162,7 +163,6 @@ void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFl
         renderParticles();
     
 }
-
 
 void Ship::renderParticles()
 {

@@ -8,5 +8,5 @@ public:
 	BG(const char* path, SDL_Renderer* renderer) : Sprite(path, renderer){}
 	~BG(){}
 
-	void render() ;
+	void render() const;
 };

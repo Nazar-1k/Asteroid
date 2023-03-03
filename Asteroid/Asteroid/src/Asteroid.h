@@ -10,7 +10,7 @@ public:
 
 	void move();
 	void deleteAsteroid();
-	bool isActive() { return to_be_deleted; }
+	bool isActive() const  { return to_be_deleted; }
 
 
 	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);

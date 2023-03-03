@@ -12,7 +12,7 @@ public:
 
 	void PoolEvent(SDL_Event& e);
 
-	void render(int width_s, int height_s);
+	void render(int width_s, int height_s) const;
 
 	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
 };

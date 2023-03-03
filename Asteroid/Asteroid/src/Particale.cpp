@@ -131,7 +131,7 @@ Particle::Particle(float x, float y,int side, SDL_Renderer* renderer)
 	}
 }
 
-void Particle::render()
+void Particle::render() 
 {
 	
     // Show image
@@ -149,11 +149,6 @@ void Particle::render()
 	{
 		dead = true;
 	}
-}
-
-bool Particle::isDead()
-{
-    return dead;
 }
 
 void Particle::setdead(bool dead)

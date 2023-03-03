@@ -6,15 +6,7 @@
 Bullet::Bullet(const char* path, SDL_Renderer* renderer, Ship& ship, Arrow& arrow)
     : Sprite(path, renderer)
 {
-    
     creatBullet(ship, arrow);
-}
-
-
-void Bullet::poolEvent(SDL_Event& event)
-{
-
-
 }
 
 void Bullet::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)

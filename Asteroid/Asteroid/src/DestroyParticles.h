@@ -9,7 +9,7 @@ public:
 	~DestroyParticles();
 
 	void render();
-	bool getOut();
+	bool getOut() const { return out; }
 
 private:
 	float x, y, side;
