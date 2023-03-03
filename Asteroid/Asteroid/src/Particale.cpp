@@ -7,6 +7,11 @@ static Sprite OrangeTexture;
 static Sprite GreyTexture;
 static Sprite ShimmerTexture;
 
+static const char pathRed[] = "data/red.png";
+static const char pathOrange[] = "data/orange.png";
+static const char pathGrey[] = "data/grey.png";
+static const char pathShimmer[] = "data/shimmer.png";
+
 Particle::Particle(float x, float y, int side, float angle, SDL_Renderer* renderer)
 	:dead(false)
 {
@@ -56,7 +61,7 @@ Particle::Particle(float x, float y, int side, float angle, SDL_Renderer* render
 	float fireX = x;
 	float fireY = y - side / 2;
 
-	float angleInRadians = angle * M_PI / 180.0;
+	float angleInRadians = static_cast<float>(angle * M_PI / 180.0);
 	// Обертання корабля навколо своїх координат
 	this->x = (x - fireX) * cos(angleInRadians) - (y - fireY) * sin(angleInRadians) + fireX+rand()%5;
 	this->y = (x - fireX) * sin(angleInRadians) + (y - fireY) * cos(angleInRadians) + fireY + side/2+rand() % 5;
@@ -83,30 +88,29 @@ Particle::Particle(float x, float y,int side, SDL_Renderer* renderer)
 		GreyTexture.setRenderer(renderer);
 		ShimmerTexture.setRenderer(renderer);
 		//Load red texture
-		if (!RedTexture.loadFromFile("data/red.png"))
+		if (!RedTexture.loadFromFile(pathRed))
 		{
-			printf("Failed to load red texture!\n");
+			std::cout<< "Failed to load texture! path ->"<< pathRed;
 		}
 
 		//Load green texture
-		if (!OrangeTexture.loadFromFile("data/orange.png"))
+		if (!OrangeTexture.loadFromFile(pathOrange))
 		{
-			printf("Failed to load green texture!\n");
+			std::cout << "Failed to load texture! path ->" << pathRed;
 
 		}
 
 		//Load blue texture
-		if (!GreyTexture.loadFromFile("data/grey.png"))
+		if (!GreyTexture.loadFromFile(pathGrey))
 		{
-			printf("Failed to load blue texture!\n");
+			std::cout << "Failed to load texture! path ->" << pathGrey;
 
 		}
 
 		//Load shimmer texture
-		if (!ShimmerTexture.loadFromFile("data/shimmer.png"))
+		if (!ShimmerTexture.loadFromFile(pathShimmer))
 		{
-			printf("Failed to load shimmer texture!\n");
-
+			std::cout << "Failed to load texture! path ->" << pathShimmer;
 		}
 
 		//Set texture transparency

@@ -5,7 +5,7 @@
 class Asteroid : public Sprite
 {
 public:
-	Asteroid(float mass, const char* path, SDL_Renderer* renderer);
+	Asteroid(float mass, SDL_Renderer* renderer);
 	~Asteroid();
 
 	void move();

@@ -11,7 +11,7 @@ class Arrow;
 class Ship : public Sprite
 {
 public:
-	Ship(const char* path, SDL_Renderer* renderer);
+	Ship(SDL_Renderer* renderer, int s_width, int s_height);
 	~Ship();
 	void PoolEvent(SDL_Event& event);
 	void move();

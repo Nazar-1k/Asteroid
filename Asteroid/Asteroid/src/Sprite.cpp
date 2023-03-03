@@ -1,19 +1,20 @@
 #include "Sprite.h"
 
-static const size_t countSprite{ 4 };
-static Sprite arraySprite[countSprite];
-
-
 Sprite::Sprite(const char* path, SDL_Renderer* renderer)
 	: renderer(renderer)
 {
 	loadFromFile(path);
-	
 }
 
 Sprite::~Sprite()
 {
 	free();
+}
+
+void Sprite::initSprite(const char* path, SDL_Renderer* renderer)
+{
+	this->renderer = renderer;
+	loadFromFile(path);
 }
 
 bool Sprite::loadFromFile(const char* path)

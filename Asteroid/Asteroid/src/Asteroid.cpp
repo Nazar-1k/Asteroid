@@ -1,23 +1,31 @@
 #include "Asteroid.h"
 #include <cmath>
 
-Asteroid::Asteroid(float mass, const char* path, SDL_Renderer* renderer)
-    : Sprite(path, renderer), to_be_deleted(false), mass(mass),
+static const char pathBigAsteroid[] = "data/big_asteroid.png";
+static const char pathSmallAsteroid[] = "data/small_asteroid.png";
+
+Asteroid::Asteroid(float mass, SDL_Renderer* renderer)
+    : to_be_deleted(false), mass(mass),
     speedrotation(static_cast<float>((rand() % (999 - 100) + 100) / static_cast<float>(1000)))
 {
+    setRenderer(renderer);
+    if (mass == 3)
+        loadFromFile(pathSmallAsteroid);
+    else 
+        loadFromFile(pathBigAsteroid);
+
+    if (!this->isEmpty())
+    {
+        std::cout << "Asteroid ERRoR: \n" << std::endl;
+    }
+
 	dx =  static_cast<float>(sin(rand() % 361 * 3.14159 / 180) * velocity);
 	dy = static_cast<float>(-cos(rand() % 361 * 3.14159 / 180) * velocity);
     x = static_cast<float>(rand() % 361);
     y = static_cast<float>(rand() % 361);
     radius = static_cast<float>(width / 2);
     
-
-    if (!this->isEmpty())
-    {
-        std::cout << "Asteroid ERRoR: \n" << std::endl;
-    }
     b_rotation = rand() % 2;
-
 }
 
 Asteroid::~Asteroid()

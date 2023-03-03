@@ -3,11 +3,17 @@
 
 static Mix_Chunk* fireSound = nullptr;
 
-Ship::Ship(const char* path, SDL_Renderer* renderer)
-    : Sprite(path, renderer)
+//soundEffects
+static const char pathFire[] = "soundEffects/fire.wav";
+
+//Sprites
+static const char pathMainShip[] = "data/spaceship.png";
+
+Ship::Ship(SDL_Renderer* renderer, int s_width, int s_height)
 {
-    x = 600;
-    y = 300;
+    initSprite(pathMainShip, renderer);
+    x = s_width / 2;
+    y = s_height / 2;
 
     //Initialize particles
     for (int i = 0; i < TOTAL_PARTICLES; ++i)
@@ -16,7 +22,7 @@ Ship::Ship(const char* path, SDL_Renderer* renderer)
     }
 
     //Load music
-    fireSound = Mix_LoadWAV("soundEffects/fire.wav");
+    fireSound = Mix_LoadWAV(pathFire);
     if (fireSound == NULL)
     {
         printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
@@ -35,7 +41,6 @@ Ship::~Ship()
 
     fireSound = nullptr;
 }
-
 
 void Ship::PoolEvent(SDL_Event& e)
 {

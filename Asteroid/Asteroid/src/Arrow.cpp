@@ -1,5 +1,11 @@
 #include "Arrow.h"
 
+static const char path[] = "data/arrow.tga";
+
+Arrow::Arrow(SDL_Renderer* renderer)
+{
+	initSprite(path, renderer);
+}
 void Arrow::PoolEvent(SDL_Event& e)
 {
 	if (e.type == SDL_MOUSEMOTION)

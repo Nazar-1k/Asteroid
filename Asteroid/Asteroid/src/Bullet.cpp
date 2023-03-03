@@ -3,9 +3,11 @@
 #include "Arrow.h"
 #include "SpaceShip.h"
 
-Bullet::Bullet(const char* path, SDL_Renderer* renderer, Ship& ship, Arrow& arrow)
-    : Sprite(path, renderer)
+static const char path[] = "data/bullet.png";
+
+Bullet::Bullet(SDL_Renderer* renderer, Ship& ship, Arrow& arrow)
 {
+    initSprite(path, renderer);
     creatBullet(ship, arrow);
 }
 
@@ -39,7 +41,7 @@ void Bullet::creatBullet(Ship& Ship, Arrow& arrow)
 
     dx = arrow.x - Ship.x;
     dy = arrow.y - Ship.y;
-    angle = atan2(dy, dx) / M_PI*180;
+    angle = static_cast<float>(atan2(dy, dx) / M_PI*180);
 
     is_bullet_active = true;
 }
@@ -48,10 +50,10 @@ void Bullet::move(int w_screen, int h_screen)
 {
     if (is_bullet_active)
     {
-        double angle = atan2(dy, dx);
-        double bulletSpeed = 10.0;
-        double bulletVelocityX = bulletSpeed * cos(angle);
-        double bulletVelocityY = bulletSpeed * sin(angle);
+        float angle = atan2(dy, dx);
+        float bulletSpeed = 10.0;
+        float bulletVelocityX = bulletSpeed * cos(angle);
+        float bulletVelocityY = bulletSpeed * sin(angle);
 
         x += bulletVelocityX;
         y += bulletVelocityY;

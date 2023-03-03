@@ -8,7 +8,7 @@ class Arrow;
 class Bullet : public Sprite
 {
 public:
-	Bullet(const char* path, SDL_Renderer* renderer, Ship& ship, Arrow& arrow);
+	Bullet(SDL_Renderer* renderer, Ship& ship, Arrow& arrow);
 	~Bullet() {  }
 
 	/*void poolEvent(SDL_Event& event) const;*/
