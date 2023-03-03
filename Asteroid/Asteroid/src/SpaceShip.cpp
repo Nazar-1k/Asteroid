@@ -133,6 +133,12 @@ void Ship::move()
 
 }
 
+void  Ship::starSet(int s_width, int s_heigth)
+{
+    x = s_width / 2;
+    y = s_heigth / 2;
+}
+
 void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
 {
     

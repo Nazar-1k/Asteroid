@@ -2,10 +2,9 @@
 
 static const char path[] = "font/TerminatorCyr.ttf";
 
-Button::Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect, bool oval)
+Button::Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect, int radius)
     : m_renderer(renderer), m_text(text), m_rect(rect), m_textColor({ 0, 0, 0, 255 }),
-    m_rectColor({ 255, 255, 255, 255 }), m_hoveredRectColor({ 200, 200, 200, 255 }),
-    m_oval(oval)
+    m_rectColor({ 255, 255, 255, 255 }), m_hoveredRectColor({ 200, 200, 200, 255 }), m_radius(radius)
 {
     // Initialize SDL_ttf
     if (TTF_Init() == -1)
@@ -24,32 +23,39 @@ Button::Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect, bool ova
         std::cout << "Unable to load font " << path << " SDL_image Error : \n" << TTF_GetError() << std::endl;
     }
 }
-
+Button::~Button()
+{
+    if (m_textTexture != nullptr) {
+        SDL_DestroyTexture(m_textTexture);
+    }
+    TTF_CloseFont(m_font);
+}
 void Button::draw()
 {
-    //// Draw button rectangle
-    //SDL_SetRenderDrawColor(m_renderer, m_rectColor.r, m_rectColor.g, m_rectColor.b, m_rectColor.a);
-    //if (m_hovered) {
-    //    SDL_SetRenderDrawColor(m_renderer, m_hoveredRectColor.r, m_hoveredRectColor.g, m_hoveredRectColor.b, m_hoveredRectColor.a);
-    //}
 
-    //// Draw button shape
-    //if (m_oval) {
-    //    SDL_RenderFillEllipse(m_renderer, m_rect.x + m_rect.w / 2, m_rect.y + m_rect.h / 2, m_rect.w / 2, m_rect.h / 2);
-    //}
-    //else {
-    //    SDL_RenderFillRect(m_renderer, &m_rect);
-    //}
 
-    //// Draw text on button
-    //SDL_Surface* surface = TTF_RenderText_Solid(m_font, m_text.c_str(), { 0, 0, 0 });
-    //SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer, surface);
-    //SDL_Rect textRect = { m_rect.x + m_rect.w / 2 - surface->w / 2, m_rect.y + m_rect.h / 2 - surface->h / 2, surface->w, surface->h };
-    //SDL_RenderCopy(m_renderer, texture, NULL, &textRect);
+    SDL_SetRenderDrawColor(m_renderer, m_rectColor.r, m_rectColor.g, m_rectColor.b, m_rectColor.a);
+    if (m_hovered) 
+    {
+        SDL_SetRenderDrawColor(m_renderer, m_hoveredRectColor.r, m_hoveredRectColor.g, m_hoveredRectColor.b, m_hoveredRectColor.a);
+    }
+    SDL_RenderFillRect(m_renderer, &m_rect);
 
-    //// Cleanup
-    //SDL_FreeSurface(surface);
-    //SDL_DestroyTexture(texture);
+    // Draw text in button
+    SDL_Surface* textSurface = TTF_RenderText_Solid(m_font, m_text.c_str(), m_textColor);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(m_renderer, textSurface);
+
+    int textWidth = textSurface->w;
+    int textHeight = textSurface->h;
+    int x = m_rect.x + (m_rect.w - textWidth) / 2;
+    int y = m_rect.y + (m_rect.h - textHeight) / 2;
+
+    SDL_Rect textRect = { x, y, textWidth, textHeight };
+    SDL_RenderCopy(m_renderer, textTexture, NULL, &textRect);
+
+    // Clean up
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
 }
 
 void Button::setPosition(int x, int y)
@@ -114,16 +120,3 @@ void Button::setHovered(bool hovered)
     m_hovered = hovered;
 }
 
-//void Button::SDL_RenderFillEllipse(SDL_Renderer* renderer, int x, int y, int rx, int ry)
-//{
-//    for (int i = -rx; i <= rx; i++)
-//    {
-//        for (int j = -ry; j <= ry; j++)
-//        {
-//            if ((i * i * ry * ry) + (j * j * rx * rx) <= (rx * rx) * (ry * ry))
-//            {
-//                SDL_RenderDrawPoint(renderer, x + i, y + j);
-//            }
-//        }
-//    }
-//}

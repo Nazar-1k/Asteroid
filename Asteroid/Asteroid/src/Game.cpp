@@ -20,6 +20,7 @@ bool Game::init()
 
 void Game::update()
 {
+	initAsteroid();
 	ship->move();
 
 	#pragma region Asteroids
@@ -32,7 +33,8 @@ void Game::update()
 
 		if (ship->colideAsteroid(*asteroid))
 		{
-			ship->setColor(0, 0, 0);
+			deleteObject();
+			ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 		#pragma endregion
 
@@ -42,6 +44,10 @@ void Game::update()
 			if (bullet->colideAsteroid(*asteroid))
 			{
 				bullet->destroy();
+				destroy_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() / 6, renderer }));
+				smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 90, 3, renderer }));
+				smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 180, 3, renderer }));
+				asteroid->deleteAsteroid();																											  
 			}
 		}
 		#pragma endregion
@@ -54,7 +60,8 @@ void Game::update()
 		#pragma region colide_SHIP
 		if (ship->colideAsteroid(*asteroid))
 		{
-			ship->setColor(0, 0, 0);
+			deleteObject();
+			ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 		#pragma endregion
 
@@ -64,7 +71,7 @@ void Game::update()
 			if (bullet->colideAsteroid(*asteroid))
 			{
 				bullet->destroy();
-				destroy_particle.push_back( std::unique_ptr<DestroyParticles>( new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth(), renderer }));
+				destroy_particle.push_back( std::unique_ptr<DestroyParticles>( new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() / 6, renderer }));
 				asteroid->deleteAsteroid();
 			}
 		}
@@ -168,8 +175,8 @@ void Game::render()
 	ship->render();
 
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
-	if(button)
-		button->draw();
+	
+	/*button->draw();*/
 	SDL_RenderPresent(renderer);
 }
 
@@ -187,7 +194,7 @@ void Game::pollEventWindow()
 			if (e.button.button == SDL_BUTTON_LEFT) 
 			{
 				bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
-			}			
+			}	
 		}
 		button->handleEvent(e, arrow->getX(), arrow->getY());
 	}
@@ -300,32 +307,7 @@ bool Game::initeObject()
 		return false;
 	}
 
-	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, renderer }));
-	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, renderer }));
-	bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 4, renderer }));
-
-	for (auto& asteroid : bigAsteroids)
-		if (!asteroid->isEmpty())
-		{
-			return false;
-		}
-
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, renderer }));
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, renderer }));
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, renderer }));
-	smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 3, renderer }));
-
-	for (auto& asteroid : smallAsteroids)
-		if (!asteroid->isEmpty())
-		{
-			return false;
-		}
-
-	for (auto& bullet : bullets)
-		if (!bullet->isEmpty())
-		{
-			return false;
-		}
+	
 
 	return true;
 }
@@ -336,7 +318,7 @@ bool Game::initButton()
 #pragma region Text_Asteroid
 
 
-	button = std::unique_ptr<Button>(new Button(renderer, "Click me!", { 100, 100, 200, 50 }, true));
+	button = std::unique_ptr<Button>(new Button(renderer, "Click me!", { 100, 100, 200, 50 }, 20));
 	button->setPosition(200, 200);
 	button->setTextColor({ 255, 255, 255, 255 });
 	button->setRectColor({ 63, 74, 92, 255 });
@@ -349,5 +331,233 @@ void Game::deleteObject()
 	bigAsteroids.clear();
 	smallAsteroids.clear();
 	bullets.clear();
+	SDL_Delay(100);
+}
 
+void Game::initAsteroid()
+{
+	if ((bigAsteroids.size() + smallAsteroids.size() < 5))
+	{
+		int randScreenSide = rand() % 2;
+		int randAsteroid = rand() % 2;
+		if (ship->getX() < SCREEN_WIDTH / 2 and ship->getY() < SCREEN_HEIGHT / 2)
+		{
+			switch (randAsteroid)
+			{
+			case 0:
+
+				switch (randScreenSide)
+				{
+					//down
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(10 + rand() % (170 - 11)), 3, renderer }));
+					break;
+
+					//right
+				case 1:
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ SCREEN_WIDTH, rand() % SCREEN_HEIGHT, static_cast<float>(100 + rand() % (270 - 101)), 3, renderer }));
+					break;
+				}
+
+				break;
+			case 1:
+				switch (randScreenSide)
+				{
+					//down
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(10 + rand() % (170 - 11)), 4, renderer }));
+					break;
+
+					//right
+				case 1:
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ SCREEN_WIDTH, rand() % SCREEN_HEIGHT, static_cast<float>(100 + rand() % (270 - 101)), 4, renderer }));
+					break;
+				}
+			}
+
+			std::cout << "1";
+			//down, right
+		}
+		else if (ship->getX() > SCREEN_WIDTH / 2 and ship->getY() < SCREEN_HEIGHT / 2)
+		{
+			switch (randAsteroid)
+			{
+			case 0:
+
+				switch (randScreenSide)
+				{
+					//down
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(10 + rand() % (170 - 11)), 3, renderer }));
+					break;
+
+					//left
+				case 1:
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 0, rand() % SCREEN_HEIGHT, static_cast<float>(260 + rand() % (440 - 261)), 3, renderer }));
+					break;
+				}
+
+				break;
+			case 1:
+				switch (randScreenSide)
+				{
+					//down
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(190 + rand() % (350 - 191)), 4, renderer }));
+					break;
+
+					//left
+				case 1:
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 0, rand() % SCREEN_HEIGHT, static_cast<float>(260 + rand() % (440 - 261)), 4, renderer }));
+					break;
+				}
+			}
+			std::cout << "2";
+			//down, left
+		}
+		else if (ship->getX() < SCREEN_WIDTH / 2 and ship->getY() > SCREEN_HEIGHT / 2)
+		{
+			switch (randAsteroid)
+			{
+			case 0:
+
+				switch (randScreenSide)
+				{
+					//top
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(170 + rand() % (350 - 171)), 3, renderer }));
+					break;
+
+					//right
+				case 1:
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ SCREEN_WIDTH, rand() % SCREEN_HEIGHT, static_cast<float>(100 + rand() % (270 - 101)), 3, renderer }));
+					break;
+				}
+
+				break;
+			case 1:
+				switch (randScreenSide)
+				{
+					//down
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(170 + rand() % (350 - 171)), 4, renderer }));
+					break;
+
+					//right
+				case 1:
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ SCREEN_WIDTH, rand() % SCREEN_HEIGHT, static_cast<float>(100 + rand() % (270 - 101)), 4, renderer }));
+					break;
+				}
+			}
+
+			std::cout << "3";
+			//top, right
+		}
+		else if (ship->getX() > SCREEN_WIDTH / 2 and ship->getY() > SCREEN_HEIGHT / 2)
+		{
+			switch (randAsteroid)
+			{
+			case 0:
+
+				switch (randScreenSide)
+				{
+					//top
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(170 + rand() % (350 - 171)), 3, renderer }));
+					break;
+
+					//left
+				case 1:
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 0, rand() % SCREEN_HEIGHT, static_cast<float>(260 + rand() % (440 - 261)), 3, renderer }));
+					break;
+				}
+
+				break;
+			case 1:
+				switch (randScreenSide)
+				{
+					//down
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(170 + rand() % (350 - 171)), 4, renderer }));
+					break;
+
+					//left
+				case 1:
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 0, rand() % SCREEN_HEIGHT, static_cast<float>(260 + rand() % (440 - 261)), 4, renderer }));
+					break;
+				}
+			}
+			std::cout << "4";
+			//top, left
+		}
+		else
+		{
+
+			randScreenSide = rand() % 4;
+			switch (randAsteroid)
+			{
+			case 0:
+
+				switch (randScreenSide)
+				{
+					//top
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(170 + rand() % (350 - 171)), 3, renderer }));
+					break;
+
+					//left
+				case 1:
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 0, rand() % SCREEN_HEIGHT, static_cast<float>(260 + rand() % (440 - 261)), 3, renderer }));
+					break;
+					//down
+				case 2:
+					/*int num = min + rand() % (max - min + 1);*/
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(10 + rand() % (170 - 11)), 3, renderer }));
+					break;
+
+					//right
+				case 3:
+					smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ SCREEN_WIDTH, rand() % SCREEN_HEIGHT, static_cast<float>(100 + rand() % (270 - 101)), 3, renderer }));
+					break;
+				}
+
+				break;
+			case 1:
+				switch (randScreenSide)
+				{
+					//top
+				case 0:
+					/*int num = min + rand() % (max - min + 1);*/
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(170 + rand() % (350 - 171)), 4, renderer }));
+					break;
+
+					//left
+				case 1:
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ 0, rand() % SCREEN_HEIGHT, static_cast<float>(260 + rand() % (440 - 261)), 4, renderer }));
+					break;
+					//down
+				case 2:
+					/*int num = min + rand() % (max - min + 1);*/
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ rand() % SCREEN_WIDTH, SCREEN_HEIGHT, static_cast<float>(10 + rand() % (170 - 11)), 4, renderer }));
+					break;
+
+					//right
+				case 3:
+					bigAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ SCREEN_WIDTH, rand() % SCREEN_HEIGHT, static_cast<float>(100 + rand() % (270 - 101)), 4, renderer }));
+					break;
+				}
+			}
+
+			//midle start game
+		}
+	}
 }

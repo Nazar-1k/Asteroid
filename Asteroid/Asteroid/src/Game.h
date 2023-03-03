@@ -33,6 +33,7 @@ private:
 	bool initeObject();
 	bool initButton();
 	void deleteObject();
+	void initAsteroid();
 
 	#pragma region Window
 	

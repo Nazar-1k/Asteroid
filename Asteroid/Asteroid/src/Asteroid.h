@@ -5,7 +5,7 @@
 class Asteroid : public Sprite
 {
 public:
-	Asteroid(float mass, SDL_Renderer* renderer);
+	Asteroid(int x, int y, float mass, int angle, SDL_Renderer* renderer);
 	~Asteroid();
 
 	void move();

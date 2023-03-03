@@ -42,8 +42,12 @@ void DestroyParticles::render()
             }
 
             //Show particles
+            double angleIncrement = 2 * M_PI / TOTAL_PARTICLES;
             for (int i = 0; i < TOTAL_PARTICLES; ++i)
             {
+                particles[i]->x += side * std::cos(i * angleIncrement);
+                particles[i]->y += side * std::sin(i * angleIncrement);
+                SDL_Delay(0.5);
                 particles[i]->render();
             }
         }

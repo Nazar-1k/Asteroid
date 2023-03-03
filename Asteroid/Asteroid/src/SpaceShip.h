@@ -16,6 +16,7 @@ public:
 	void PoolEvent(SDL_Event& event);
 	void move();
 
+	void starSet(int s_width, int s_heigth);
 	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void destroy() { is_active = false; }
 	bool colideAsteroid(Asteroid& ast);
