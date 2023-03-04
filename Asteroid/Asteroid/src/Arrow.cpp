@@ -1,6 +1,6 @@
 #include "Arrow.h"
 
-static const char path[] = "data/arrow.tga";
+static const char path[] = "data/Arrow/arrow.tga";
 
 Arrow::Arrow(SDL_Renderer* renderer)
 {

@@ -3,7 +3,7 @@
 #include "Arrow.h"
 #include "SpaceShip.h"
 
-static const char path[] = "data/bullet.png";
+static const char path[] = "data/Bullet/bullet.png";
 
 Bullet::Bullet(SDL_Renderer* renderer, Ship& ship, Arrow& arrow)
 {

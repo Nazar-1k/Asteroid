@@ -150,10 +150,7 @@ void Game::render()
 		if (!smallAsteroids[i]->isActive())
 			smallAsteroids[i]->render();
 		else
-		{
-		
 			smallAsteroids.erase(smallAsteroids.begin() + i);
-		}
 	}
 
 	for (size_t i = 0; i < bigAsteroids.size(); i++)
@@ -176,7 +173,11 @@ void Game::render()
 
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
 	
-	/*button->draw();*/
+	Asteroid_main_menu_text->draw();
+
+	pLay_button->draw();
+
+	quit_play->draw(1);
 	SDL_RenderPresent(renderer);
 }
 
@@ -196,7 +197,8 @@ void Game::pollEventWindow()
 				bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
 			}	
 		}
-		button->handleEvent(e, arrow->getX(), arrow->getY());
+		pLay_button->handleEvent(e, arrow->getX(), arrow->getY());
+		quit_play->handleEvent(e, arrow->getX(), arrow->getY());
 	}
 }
 
@@ -317,12 +319,17 @@ bool Game::initButton()
 	
 #pragma region Text_Asteroid
 
+	Asteroid_main_menu_text = std::unique_ptr<Text>(new Text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4, renderer, "Asteroid", 80, { 89, 104, 130, 255 }));
 
-	button = std::unique_ptr<Button>(new Button(renderer, "Click me!", { 100, 100, 200, 50 }, 20));
-	button->setPosition(200, 200);
-	button->setTextColor({ 255, 255, 255, 255 });
-	button->setRectColor({ 63, 74, 92, 255 });
+	pLay_button = std::unique_ptr<Button>(new Button{ renderer, "Play", {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 250, 100}});
+	pLay_button->setPosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	pLay_button->setTextColor({ 255, 255, 255, 255 });
+	pLay_button->setRectColor({ 46, 97, 186, 255 });
 
+
+	quit_play = std::unique_ptr<Button>(new Button{ renderer, "Exit", 350, 400,"data/Menu/4.png"});
+
+	
 	return true;
 }
 

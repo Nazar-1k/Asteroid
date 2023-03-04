@@ -7,7 +7,7 @@ static Mix_Chunk* fireSound = nullptr;
 static const char pathFire[] = "soundEffects/fire.wav";
 
 //Sprites
-static const char pathMainShip[] = "data/spaceship.png";
+static const char pathMainShip[] = "data/Spaceship/spaceship.png";
 
 Ship::Ship(SDL_Renderer* renderer, int s_width, int s_height)
 {

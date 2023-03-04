@@ -1,8 +1,8 @@
 #include "Asteroid.h"
 #include <cmath>
 
-static const char pathBigAsteroid[] = "data/big_asteroid.png";
-static const char pathSmallAsteroid[] = "data/small_asteroid.png";
+static const char pathBigAsteroid[] = "data/Asteroids/big_asteroid.png";
+static const char pathSmallAsteroid[] = "data/Asteroids/small_asteroid.png";
 
 Asteroid::Asteroid(int x , int y, float angle, int mass, SDL_Renderer* renderer)
     : to_be_deleted(false), mass(mass),

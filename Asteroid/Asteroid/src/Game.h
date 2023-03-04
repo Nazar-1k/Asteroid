@@ -7,6 +7,7 @@
 #include "Bullet.h"
 #include "DestroyParticles.h"
 #include "Button.h"
+#include "Text.h"
 #include <vector>
 
 
@@ -68,8 +69,11 @@ private:
 	#pragma endregion
 
 	#pragma region Main_menu
+	std::unique_ptr<Text> Asteroid_main_menu_text;
+	
+	std::unique_ptr<Button> pLay_button;
 
-	std::unique_ptr<Button> button;
+	std::unique_ptr<Button> quit_play;
 
 	#pragma endregion
 	

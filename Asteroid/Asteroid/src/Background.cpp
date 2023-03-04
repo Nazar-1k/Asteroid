@@ -1,7 +1,7 @@
 #include "Background.h"
 #include "Game.h"
 
-static const char path[] = "data/background.png";
+static const char path[] = "data/BG/background.png";
 
 BG::BG(SDL_Renderer* renderer)
 {
