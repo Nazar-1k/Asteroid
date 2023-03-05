@@ -16,6 +16,7 @@ public:
     int getWidth() { return textSurface->w; }
     int getHeight() { return textSurface->h; }
 
+    void SetText(std::string text);
 
     void setAlpha(Uint8 alpha);
     

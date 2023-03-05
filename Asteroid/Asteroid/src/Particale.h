@@ -15,6 +15,7 @@ public:
 	//Checks if particle is dead
 	bool isDead() const { return dead; }
 	void setdead(bool dead);
+	void setAlfa(Uint8 alpha);
 
 	//Offsets
 	float x, y;

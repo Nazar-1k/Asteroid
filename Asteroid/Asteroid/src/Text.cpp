@@ -63,3 +63,8 @@ void Text::setTextColor(SDL_Color textColor)
 {
     m_textColor = textColor;
 }
+
+void Text::SetText(std::string text)
+{
+    m_text = text;
+}

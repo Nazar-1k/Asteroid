@@ -33,8 +33,19 @@ private:
 	bool initWindow();
 	bool initeObject();
 	bool initButton();
+	void initAsteroid(int count);
+
+	void renderAsteroid();
+	void moveAsteroid();
+
+	void renderBullets();
+	void updateBullets();
+
+	void renderMainMenu();
+	void renderGameInterface();
+
+
 	void deleteObject();
-	void initAsteroid();
 
 	#pragma region Window
 	
@@ -72,10 +83,63 @@ private:
 	std::unique_ptr<Text> Asteroid_main_menu_text;
 	
 	std::unique_ptr<Button> pLay_button;
+	std::unique_ptr<Button> quit_button;
 
-	std::unique_ptr<Button> quit_play;
+	std::unique_ptr<Button> setings_button;
+	std::unique_ptr<Button> score_button;
+	std::unique_ptr<Button> info_button;
+
+	bool menu;
+	bool game;
+
+	bool setings;
+	bool info;
+	bool score;
 
 	#pragma endregion
+
+#pragma region GameInterface
+
+	std::unique_ptr<Text> score_text;
+	int score_points;
+	std::unique_ptr<Button> stop_button;
+
+	std::unique_ptr<Sprite> heart;
+	
+	bool stop_menu;
+	Timer stop_timer;
+
+
+	#pragma region stopMenu
+	
+	SDL_Rect bgStopMenu;
+
+	std::unique_ptr<Text> pause_text;
+
+	std::unique_ptr<Button> continue_button;
+	std::unique_ptr<Button> restart_button;
+	std::unique_ptr<Button> back_button;
+
+	bool continue_stopMenu;
+	bool restart_stopMenu;
+	bool back_stopMenu;
+
+	#pragma endregion
+
+	#pragma region GameOverMenu
+
+	bool gameover;
+	std::unique_ptr<Text> gameOver_text;
+
+	std::unique_ptr<Button> restart_button_;
+	std::unique_ptr<Button> back_button_;
+
+	bool restart_GameOver;
+	bool back_GameOver;
+
+	#pragma endregion
+	
+#pragma endregion
 	
 
 

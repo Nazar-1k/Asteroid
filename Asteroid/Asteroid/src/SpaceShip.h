@@ -18,11 +18,16 @@ public:
 
 	void starSet(int s_width, int s_heigth);
 	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
-	void destroy() { is_active = false; }
 	bool colideAsteroid(Asteroid& ast);
 
 	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
 
+	int getLife() const { return count_life; }
+	void takeLife();
+
+	bool isDead() const { return dead; }
+	void setDead(bool dead);
+	
 private:
 	bool keyUP = false;
 	bool keyDown = false;
@@ -34,7 +39,8 @@ private:
 
 	float dx, dy;
 
-	bool is_active;
+	bool dead;
+	int count_life;
 
 	//Particle count
 	static const int TOTAL_PARTICLES = 20;
@@ -43,5 +49,4 @@ private:
 
 	//Shows the particles
 	void renderParticles();
-	
 };

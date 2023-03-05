@@ -9,17 +9,23 @@
 class Button {
 public:
     Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect);
-    Button(SDL_Renderer* renderer, std::string text, int x, int y, const char path[]);
+    Button(SDL_Renderer* renderer, std::string text, int x, int y, const char path[], SDL_Color clor);
+    Button(SDL_Renderer* renderer, int x, int y, const char path[]);
     ~Button();
        
     void handleEvent(const SDL_Event& event, float mouseX, float mouseY);
     
     void draw();
-    void draw(int a);
+    void draw(Uint8 alpha);
+    void drawSpriteButton();
+
     bool isMouseOver(float mouseX, float mouseY) const;
     bool isPressed() const;
 
     void setPosition(int x, int y);
+
+    int getWidth() { return m_rect.w; }
+    int getHeight() { return m_rect.h; }
 
     void setTextColor(SDL_Color textColor);
     void setText(std::string text);

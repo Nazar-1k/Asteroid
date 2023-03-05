@@ -12,8 +12,8 @@ static const char pathMainShip[] = "data/Spaceship/spaceship.png";
 Ship::Ship(SDL_Renderer* renderer, int s_width, int s_height)
 {
     initSprite(pathMainShip, renderer);
-    x = s_width / 2;
-    y = s_height / 2;
+    count_life = 3;
+    starSet(s_width, s_height);    
 
     //Initialize particles
     for (int i = 0; i < TOTAL_PARTICLES; ++i)
@@ -135,13 +135,34 @@ void Ship::move()
 
 void  Ship::starSet(int s_width, int s_heigth)
 {
-    x = s_width / 2;
-    y = s_heigth / 2;
+    dx = 0;
+    dy = 0;
+    angle = 0;
+    x = static_cast<float>(s_width / 2);
+    y = static_cast<float>(s_heigth / 2);
+
+    if (dead == true)
+    {
+        count_life = 3;
+        dead = false;
+    }
 }
 
-void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
+void Ship::takeLife()
 {
-    
+    if (count_life>=0)
+        count_life--;
+}
+
+void Ship::setDead(bool dead)
+{
+    this->dead = dead;
+}
+
+
+
+void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
+{ 
         angle = this->angle;
         //Set rendering space and render to screen
         SDL_Rect renderQuad = { static_cast<int>(x - width / 2),  static_cast<int>(y - height / 2), width, height };
@@ -211,4 +232,5 @@ bool Ship::colideAsteroid(Asteroid& ast)
     float fy = ast.y - y;
 
     return  std::sqrt(fx * fx + fy * fy) <= ast.radius + width / 2;
+
 }

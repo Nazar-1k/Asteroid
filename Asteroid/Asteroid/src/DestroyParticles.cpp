@@ -29,24 +29,21 @@ void DestroyParticles::render()
             timer->start();
             time_out = true;
         }
-        else if (time_out and timer->getTicks() - timer->isStarted() <= 100)
-        {        //Go through particle
-            for (int i = 0; i < TOTAL_PARTICLES; ++i)
-            {
-                //Delete and replace dead particles
-                if (particles[i]->isDead())
-                {
-                    delete particles[i];
-                    particles[i] = new Particle(x, y, side, renderer);
-                }
-            }
-
+        else if (time_out and timer->getTicks() - timer->isStarted() <= 300)
+        {        
+           
+            int x = particles[1]->x;
+            int y = particles[1]->y;
             //Show particles
             double angleIncrement = 2 * M_PI / TOTAL_PARTICLES;
             for (int i = 0; i < TOTAL_PARTICLES; ++i)
             {
+
                 particles[i]->x += side * std::cos(i * angleIncrement);
                 particles[i]->y += side * std::sin(i * angleIncrement);
+
+                
+                particles[i]->setAlfa(255-i*12);
                 SDL_Delay(0.5);
                 particles[i]->render();
             }

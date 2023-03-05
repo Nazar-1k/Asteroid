@@ -2,8 +2,10 @@
 
 Game::Game()
 	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
-	window(nullptr), renderer(nullptr), bg(nullptr)
+	window(nullptr), renderer(nullptr), bg(nullptr),
+	 menu(true), game(false), stop_menu(false), setings(false), info(false), score(false), score_points(0), gameover(false)
 {
+	
 }
 
 Game::~Game()
@@ -20,109 +22,27 @@ bool Game::init()
 
 void Game::update()
 {
-	initAsteroid();
-	ship->move();
-
-	#pragma region Asteroids
-
-	//BIG Asteroid
-	for (auto& asteroid : bigAsteroids)
+	if (menu)
 	{
-		asteroid->move();
-		#pragma region colideBigAsteroid__SHIP
-
-		if (ship->colideAsteroid(*asteroid))
+		
+			
+		initAsteroid(8);
+		moveAsteroid();
+	}
+	else if (game)
+	{
+		if (!stop_menu)
 		{
-			deleteObject();
-			ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
-		}
-		#pragma endregion
+			ship->move();
 
-		#pragma region colideBigAsteroid__Bullet
-		for (auto& bullet : bullets)
-		{
-			if (bullet->colideAsteroid(*asteroid))
-			{
-				bullet->destroy();
-				destroy_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() / 6, renderer }));
-				smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 90, 3, renderer }));
-				smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 180, 3, renderer }));
-				asteroid->deleteAsteroid();																											  
-			}
+			initAsteroid(5);
+			moveAsteroid();
+			
+			updateBullets();
 		}
-		#pragma endregion
+		
 	}
 
-	//Small Asteroid
-	for (auto& asteroid : smallAsteroids)
-	{
-		asteroid->move();
-		#pragma region colide_SHIP
-		if (ship->colideAsteroid(*asteroid))
-		{
-			deleteObject();
-			ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
-		}
-		#pragma endregion
-
-		#pragma region colide__Bullet
-		for (auto& bullet : bullets)
-		{
-			if (bullet->colideAsteroid(*asteroid))
-			{
-				bullet->destroy();
-				destroy_particle.push_back( std::unique_ptr<DestroyParticles>( new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() / 6, renderer }));
-				asteroid->deleteAsteroid();
-			}
-		}
-		#pragma endregion
-	}
-
-	#pragma region Colide-BigAsteroid__BigAsteroid
-	for (auto& asteroid1 : bigAsteroids)
-	{
-		for (auto& asteroid2 : bigAsteroids)
-		{
-			if (asteroid1 != asteroid2 and Asteroid::checkColition(*asteroid1, *asteroid2))
-			{
-				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
-			}
-		}
-	}
-	#pragma endregion
-
-	#pragma region Colide-SmallAsteroid__SmallAsteroid
-	for (auto& asteroid1 : smallAsteroids)
-	{
-		for (auto& asteroid2 : smallAsteroids)
-		{
-			if (asteroid1 != asteroid2 and Asteroid::checkColition(*asteroid1, *asteroid2))
-			{
-				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
-			}
-		}
-	}
-	#pragma endregion
-
-	#pragma region Colide-BigAsteroid__SmallAsteroid
-	for (auto& asteroid1 : bigAsteroids)
-	{
-		for (auto& asteroid2 : smallAsteroids)
-		{
-			if (Asteroid::checkColition(*asteroid1, *asteroid2))
-			{
-				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
-			}
-		}
-	}
-	#pragma endregion
-
-	#pragma endregion
-
-	for (auto& bullet : bullets)
-	{
-		bullet->move(SCREEN_WIDTH, SCREEN_HEIGHT);
-	}
 }
 
 void Game::render()
@@ -131,53 +51,35 @@ void Game::render()
 	
 	bg->render();
 
-	if (!destroy_particle.empty())
+	if (menu)
 	{
-		for (size_t i = 0; i < destroy_particle.size(); i++)
+		renderAsteroid();
+
+		renderMainMenu();
+
+		if (setings)
 		{
-				destroy_particle[i]->render();
-			if (destroy_particle[i]->getOut())
-			{
-				destroy_particle.erase(destroy_particle.begin() + i);
-			}
-			
+
+		}
+		else if (info)
+		{
+		}
+		else if(score)
+		{
 		}
 	}
-	
-
-	for (size_t i = 0; i < smallAsteroids.size(); i++)
+	else if (game)
 	{
-		if (!smallAsteroids[i]->isActive())
-			smallAsteroids[i]->render();
-		else
-			smallAsteroids.erase(smallAsteroids.begin() + i);
-	}
+		renderAsteroid();
 
-	for (size_t i = 0; i < bigAsteroids.size(); i++)
-	{
-		if (!bigAsteroids[i]->isActive())
-			bigAsteroids[i]->render();
-		else
-			bigAsteroids.erase(bigAsteroids.begin() + i);
-	}
-	
-	for (size_t i = 0; i < bullets.size(); i++)
-	{
-		if (bullets[i]->isActive()) 
-			bullets[i]->render();
-		else
-			bullets.erase(bullets.begin() + i);
-	}
-	
-	ship->render();
+		renderBullets();
 
+		ship->render();
+
+		renderGameInterface();
+	}
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
-	
-	Asteroid_main_menu_text->draw();
 
-	pLay_button->draw();
-
-	quit_play->draw(1);
 	SDL_RenderPresent(renderer);
 }
 
@@ -192,13 +94,127 @@ void Game::pollEventWindow()
 		arrow->PoolEvent(e);
 		if (e.type == SDL_MOUSEBUTTONDOWN)
 		{
+			
 			if (e.button.button == SDL_BUTTON_LEFT) 
 			{
-				bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
+				if(!stop_menu)
+					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
 			}	
+
 		}
+
 		pLay_button->handleEvent(e, arrow->getX(), arrow->getY());
-		quit_play->handleEvent(e, arrow->getX(), arrow->getY());
+		quit_button->handleEvent(e, arrow->getX(), arrow->getY());
+
+		score_button->handleEvent(e, arrow->getX(), arrow->getY());
+		setings_button->handleEvent(e, arrow->getX(), arrow->getY());
+		info_button->handleEvent(e, arrow->getX(), arrow->getY());
+
+		stop_button->handleEvent(e, arrow->getX(), arrow->getY());
+
+		continue_button->handleEvent(e, arrow->getX(), arrow->getY());
+		restart_button-> handleEvent(e, arrow->getX(), arrow->getY());;
+		back_button->handleEvent(e, arrow->getX(), arrow->getY());
+		restart_button_->handleEvent(e, arrow->getX(), arrow->getY());
+		back_button_->handleEvent(e, arrow->getX(), arrow->getY());
+
+
+		if (e.type == SDL_MOUSEBUTTONDOWN)
+		{
+			if (e.button.button == SDL_BUTTON_LEFT)
+			{
+
+			#pragma region MenuButton
+				if (menu)
+				{
+					if (pLay_button->isPressed())
+					{
+						game = true;
+						menu = false;
+						deleteObject();
+					}
+					else if (quit_button->isPressed())
+					{
+						quit = true;
+					}
+					else if (setings_button->isPressed())
+					{
+
+					}
+					else if (score_button->isPressed())
+					{
+
+					}
+					else if (info_button->isPressed())
+					{
+
+					}
+				}
+
+#pragma endregion
+
+			#pragma region GameMenu
+				if (game)
+				{
+					if (stop_button->isPressed())
+					{
+						if (stop_menu == false)
+							stop_menu = true;
+						else if (stop_menu == true)
+							stop_menu = false;
+					}
+					if (stop_menu)
+					{
+						if (continue_button->isPressed())
+						{
+							stop_menu = false;
+						}
+						else if(restart_button->isPressed())
+						{
+							deleteObject();
+							ship->setDead(true);
+							score_points = 0;
+							ship->starSet(SCREEN_WIDTH,SCREEN_HEIGHT);
+							stop_menu = false;
+						}
+						else if (back_button->isPressed())
+						{
+							deleteObject();
+							ship->setDead(true);
+							score_points = 0;
+							menu = true;
+							game = false;
+							stop_menu = false;
+						}
+					}
+					if (gameover)
+					{
+						
+						if (restart_button_->isPressed())
+						{
+							deleteObject();
+							ship->setDead(true);
+							score_points = 0;
+							ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
+							gameover = false;
+							stop_menu = false;
+						}
+						else if (back_button_->isPressed())
+						{
+							deleteObject();
+							ship->setDead(true);
+							score_points = 0;
+							menu = true;
+							game = false;
+							gameover = false;
+							stop_menu = false;
+						}
+					}
+
+				}
+			#pragma endregion
+			}
+		}
 	}
 }
 
@@ -317,7 +333,8 @@ bool Game::initeObject()
 bool Game::initButton()
 {
 	
-#pragma region Text_Asteroid
+#pragma region MainMenu
+
 
 	Asteroid_main_menu_text = std::unique_ptr<Text>(new Text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4, renderer, "Asteroid", 80, { 89, 104, 130, 255 }));
 
@@ -327,23 +344,74 @@ bool Game::initButton()
 	pLay_button->setRectColor({ 46, 97, 186, 255 });
 
 
-	quit_play = std::unique_ptr<Button>(new Button{ renderer, "Exit", 350, 400,"data/Menu/4.png"});
+	quit_button = std::unique_ptr<Button>(new Button{ renderer, "Exit", SCREEN_WIDTH / 2, (SCREEN_HEIGHT / 2) + (SCREEN_HEIGHT / 5),"data/Menu/exit.png",{60, 88, 160} });
+
+	info_button = std::unique_ptr<Button>(new Button{ renderer, SCREEN_WIDTH - SCREEN_WIDTH / 15, SCREEN_HEIGHT - SCREEN_HEIGHT / 10,"data/Menu/info1.png" });
+	setings_button = std::unique_ptr<Button>(new Button{ renderer, SCREEN_WIDTH - SCREEN_WIDTH /15 - info_button->getWidth() - info_button->getWidth(), SCREEN_HEIGHT - SCREEN_HEIGHT / 10,"data/Menu/setings1.png"});
+	score_button = std::unique_ptr<Button>(new Button{ renderer, SCREEN_WIDTH - SCREEN_WIDTH / 15 - info_button->getWidth() - info_button->getWidth() - setings_button->getWidth() - info_button->getWidth() / 2, SCREEN_HEIGHT - SCREEN_HEIGHT / 10,"data/Menu/score1.png"});
+	
+#pragma endregion
+	
+#pragma region GameInterface
+
+	stop_button = std::unique_ptr<Button>(new Button{ renderer, 1, 1, "data/Menu/stop.png" });
+	stop_button->setPosition(SCREEN_WIDTH - stop_button->getWidth(), 25);
+	stop_button->setTextColor({ 255, 255, 255, 255 });
+	stop_button->setRectColor({ 46, 97, 186, 255 });
+
+	score_text = std::unique_ptr<Text>(new Text(1, 1, renderer, "Score", 30, { 89, 104, 130, 255 }));
+	score_text->setPosition(SCREEN_WIDTH - stop_button->getWidth() - score_text->getWidth () , 25);
+
+
+	heart = std::unique_ptr<Sprite>(new Sprite{ "data/Menu/heart.png", renderer });
+	
+	heart->setX(static_cast<float>(heart->getWidth() + 50));
+	heart->setY(static_cast<float>(heart->getHeight() + 50));
+
+
+
+	#pragma region stopMenu
+
+	bgStopMenu = { SCREEN_WIDTH / 6 ,  SCREEN_HEIGHT / 6,SCREEN_WIDTH - SCREEN_WIDTH / 3 ,SCREEN_HEIGHT - SCREEN_HEIGHT / 3 };
+
+	pause_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2, bgStopMenu.y + 60, renderer, "Pause", 80, { 255, 255, 255, 255 } });
+
+	back_button  = std::unique_ptr<Button>(new Button{ renderer, 1, 1, "data/Menu/back.png" });
+	back_button->setPosition(SCREEN_WIDTH/ 2 - 200, SCREEN_HEIGHT / 2 + 50);
+
+	continue_button = std::unique_ptr<Button>(new Button{ renderer, 1, 1, "data/Menu/pause_.png" });
+	continue_button->setPosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50);
+
+	restart_button = std::unique_ptr<Button>(new Button{ renderer, 1, 1, "data/Menu/restart.png" });
+	restart_button->setPosition(SCREEN_WIDTH / 2 + 200, SCREEN_HEIGHT / 2 + 50);
+	
+	
+
+
+
+
+	#pragma endregion
+
+#pragma region GameOverMenu
+	gameOver_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2, bgStopMenu.y + 60, renderer, "Game Over", 100, { 255, 255, 255, 255 } });
+
+	restart_button_ = std::unique_ptr<Button>(new Button{ renderer, 1, 1, "data/Menu/restart.png" });
+	restart_button_->setPosition(SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2 + 50);
+	
+	back_button_ = std::unique_ptr<Button>(new Button{ renderer, 1, 1, "data/Menu/back.png" });
+	back_button_->setPosition(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 50);
 
 	
+
+#pragma endregion
+
+#pragma endregion
 	return true;
 }
 
-void Game::deleteObject()
+void Game::initAsteroid(int count)
 {
-	bigAsteroids.clear();
-	smallAsteroids.clear();
-	bullets.clear();
-	SDL_Delay(100);
-}
-
-void Game::initAsteroid()
-{
-	if ((bigAsteroids.size() + smallAsteroids.size() < 5))
+	if ((bigAsteroids.size() + smallAsteroids.size() < count))
 	{
 		int randScreenSide = rand() % 2;
 		int randAsteroid = rand() % 2;
@@ -384,7 +452,7 @@ void Game::initAsteroid()
 				}
 			}
 
-			std::cout << "1";
+		
 			//down, right
 		}
 		else if (ship->getX() > SCREEN_WIDTH / 2 and ship->getY() < SCREEN_HEIGHT / 2)
@@ -423,7 +491,7 @@ void Game::initAsteroid()
 					break;
 				}
 			}
-			std::cout << "2";
+			
 			//down, left
 		}
 		else if (ship->getX() < SCREEN_WIDTH / 2 and ship->getY() > SCREEN_HEIGHT / 2)
@@ -463,7 +531,7 @@ void Game::initAsteroid()
 				}
 			}
 
-			std::cout << "3";
+			
 			//top, right
 		}
 		else if (ship->getX() > SCREEN_WIDTH / 2 and ship->getY() > SCREEN_HEIGHT / 2)
@@ -502,7 +570,7 @@ void Game::initAsteroid()
 					break;
 				}
 			}
-			std::cout << "4";
+			
 			//top, left
 		}
 		else
@@ -567,4 +635,260 @@ void Game::initAsteroid()
 			//midle start game
 		}
 	}
+}
+
+void  Game::renderAsteroid()
+{
+	for (size_t i = 0; i < smallAsteroids.size(); i++)
+	{
+		if (!smallAsteroids[i]->isActive())
+			smallAsteroids[i]->render();
+		else
+			smallAsteroids.erase(smallAsteroids.begin() + i);
+	}
+
+	for (size_t i = 0; i < bigAsteroids.size(); i++)
+	{
+		if (!bigAsteroids[i]->isActive())
+			bigAsteroids[i]->render();
+		else
+			bigAsteroids.erase(bigAsteroids.begin() + i);
+	}
+}
+
+void Game::moveAsteroid()
+{
+	//BIG Asteroid
+	for (auto& asteroid : bigAsteroids)
+	{
+		asteroid->move();
+#pragma region colideBigAsteroid__SHIP
+
+		if (ship->colideAsteroid(*asteroid) and menu == false)
+		{
+			deleteObject();
+
+			if (ship->getLife() > 0)
+			{
+				ship->takeLife();
+				if (ship->getLife() == 0)
+				{
+					score_points = 0;
+					ship->setDead(true);
+					stop_menu = true;
+					gameover = true;
+				}
+			}
+			if (gameover == false)
+			{
+				ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+			}
+			
+		}
+#pragma endregion
+
+#pragma region colideBigAsteroid__Bullet
+		for (auto& bullet : bullets)
+		{
+			if (bullet->colideAsteroid(*asteroid))
+			{
+				bullet->destroy();
+				destroy_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() /10 , renderer }));
+				smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 90, 3, renderer }));
+				smallAsteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 180, 3, renderer }));
+				asteroid->deleteAsteroid();
+				score_points += 10;
+			}
+		}
+#pragma endregion
+	}
+
+	//Small Asteroid
+	for (auto& asteroid : smallAsteroids)
+	{
+		asteroid->move();
+#pragma region colide_SHIP
+		if (ship->colideAsteroid(*asteroid) and menu == false)
+		{
+
+
+			if (ship->getLife() > 0)
+			{
+				ship->takeLife();
+				if (ship->getLife() == 0)
+				{
+					ship->setDead(true);
+					score_points = 0;
+					stop_menu = true;
+					gameover = true;
+				}
+			}
+			if (gameover == false)
+			{
+				ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
+				deleteObject();
+
+			}
+		}
+#pragma endregion
+
+#pragma region colide__Bullet
+		for (auto& bullet : bullets)
+		{
+			if (bullet->colideAsteroid(*asteroid))
+			{
+				bullet->destroy();
+				destroy_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() / 10, renderer }));
+				asteroid->deleteAsteroid();
+				score_points += 5;
+			}
+		}
+#pragma endregion
+	}
+
+	#pragma region Colide-BigAsteroid__BigAsteroid
+	for (auto& asteroid1 : bigAsteroids)
+	{
+		for (auto& asteroid2 : bigAsteroids)
+		{
+			if (asteroid1 != asteroid2 and Asteroid::checkColition(*asteroid1, *asteroid2))
+			{
+				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
+			}
+		}
+	}
+	#pragma endregion
+
+	#pragma region Colide-SmallAsteroid__SmallAsteroid
+	for (auto& asteroid1 : smallAsteroids)
+	{
+		for (auto& asteroid2 : smallAsteroids)
+		{
+			if (asteroid1 != asteroid2 and Asteroid::checkColition(*asteroid1, *asteroid2))
+			{
+				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
+			}
+		}
+	}
+	#pragma endregion
+
+	#pragma region Colide-BigAsteroid__SmallAsteroid
+	for (auto& asteroid1 : bigAsteroids)
+	{
+		for (auto& asteroid2 : smallAsteroids)
+		{
+			if (Asteroid::checkColition(*asteroid1, *asteroid2))
+			{
+				Asteroid::reflectingAsteroids(*asteroid1, *asteroid2);
+			}
+		}
+	}
+	#pragma endregion
+}
+
+void Game::renderBullets()
+{
+	if (!destroy_particle.empty())
+	{
+		for (size_t i = 0; i < destroy_particle.size(); i++)
+		{
+			destroy_particle[i]->render();
+			if (destroy_particle[i]->getOut())
+			{
+				destroy_particle.erase(destroy_particle.begin() + i);
+			}
+
+		}
+	}
+
+	for (size_t i = 0; i < bullets.size(); i++)
+	{
+		if (bullets[i]->isActive())
+			bullets[i]->render();
+		else
+			bullets.erase(bullets.begin() + i);
+	}
+}
+
+void Game::updateBullets()
+{
+	for (auto& bullet : bullets)
+	{
+		bullet->move(SCREEN_WIDTH, SCREEN_HEIGHT);
+	}
+}
+
+void Game::renderMainMenu()
+{
+	Asteroid_main_menu_text->draw();
+
+	pLay_button->draw();
+
+	quit_button->draw(static_cast<Uint8>(100));
+
+	score_button->drawSpriteButton();
+	setings_button->drawSpriteButton();
+	info_button->drawSpriteButton();
+}
+
+void Game::renderGameInterface()
+{
+	score_text->SetText("Score: " + std::to_string(score_points));
+	score_text->draw();
+	stop_button->drawSpriteButton();
+
+	if (ship->getLife() >= 1)
+	{
+		heart->setX(10);
+		heart->setY(10);
+		heart->render();
+	}
+
+	if (ship->getLife() >= 2)
+	{
+		heart->setX(heart->getX() + heart->getWidth());
+		heart->render();
+	}
+	
+	
+
+	if (ship->getLife() == 3)
+	{
+
+		heart->setX(heart->getX() + heart->getWidth());
+		heart->render();
+	}
+
+	#pragma region stopMenu
+	if (stop_menu and !gameover)
+	{
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer,  89, 104, 130, static_cast<Uint8>(200) );
+		SDL_RenderFillRect(renderer, &bgStopMenu);
+
+		pause_text->draw();
+		
+		continue_button->drawSpriteButton();
+		restart_button->drawSpriteButton();
+		back_button->drawSpriteButton();
+	}
+	else if (gameover)
+	{
+			gameOver_text->draw();
+
+			restart_button_->drawSpriteButton();
+			back_button_->drawSpriteButton();
+	}
+
+	#pragma endregion
+
+
+}
+
+void Game::deleteObject()
+{
+	bigAsteroids.clear();
+	smallAsteroids.clear();
+	bullets.clear();
 }

@@ -28,20 +28,41 @@ Button::Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect)
     m_rect_bottom = { m_rect.x + 10, m_rect.y + 10, m_rect.w, m_rect.h };
 }
 
-Button::Button(SDL_Renderer* renderer, std::string text, int x, int y, const char path[])
+Button::Button(SDL_Renderer* renderer, std::string text, int x, int y, const char path[], SDL_Color color)
     : m_renderer(renderer), m_text(text)
 {
     
     sprite_b = std::unique_ptr<Sprite>(new Sprite{ path , renderer });
-    sprite_b->setX(x);
-    sprite_b->setY(y);
+    
 
-    text_b = std::unique_ptr<Text>(new Text{ x + sprite_b->getWidth() + 50 , y  , m_renderer , m_text, 45 , {60, 88, 160}});
+    text_b = std::unique_ptr<Text>(new Text{ x + sprite_b->getWidth() + 30 , y  , m_renderer , m_text, 45 , color });
     sprite_b->setHeight(text_b->getHeight());
     
-    m_rect = { x,y,(sprite_b->getWidth() + text_b->getWidth() + 50), (sprite_b->getHeight() ) };
+    m_rect = { x,y,(sprite_b->getWidth() + text_b->getWidth() + 30), (sprite_b->getHeight() ) };
+    m_rect.x -= m_rect.w / 2;
+    m_rect.y -= m_rect.h / 2;
+
+    sprite_b->setX(static_cast<float>(m_rect.x));
+    sprite_b->setY(static_cast<float>(m_rect.y));
+
+    text_b->setPosition(static_cast<int>(m_rect.x + sprite_b->getWidth() + 30), static_cast<int>(m_rect.y));
+}
+
+Button::Button(SDL_Renderer* renderer, int x, int y, const char path[])
+{
+    sprite_b = std::unique_ptr<Sprite>(new Sprite{ path , renderer });
+    sprite_b->setX(static_cast<float>(x));
+    sprite_b->setY(static_cast<float>(y));
+    m_rect = { static_cast<int>(sprite_b->getX()), static_cast<int>(sprite_b->getY()), sprite_b->getWidth(),  sprite_b->getHeight() };
+
+    m_rect.x -= m_rect.w / 2;
+    m_rect.y -= m_rect.h / 2;
+    
+    sprite_b->setX(static_cast<float>(m_rect.x));
+    sprite_b->setY(static_cast<float>(m_rect.y));
 
 }
+
 Button::~Button()
 {
     TTF_CloseFont(m_font);
@@ -49,8 +70,6 @@ Button::~Button()
 
 void Button::draw()
 {
-    
-    
     SDL_SetRenderDrawColor(m_renderer, 63, 48, 183, m_rectColor.a);
     SDL_RenderFillRect(m_renderer, &m_rect_bottom);
 
@@ -68,7 +87,7 @@ void Button::draw()
             m_rect.y = m_rect_bottom.y - 5;
 
       
-        SDL_SetRenderDrawColor(m_renderer, 55, 116, 224, 0);
+        SDL_SetRenderDrawColor(m_renderer, 55, 116, 224, 255);
     }
     else
     {
@@ -83,14 +102,6 @@ void Button::draw()
             m_rect.y = m_rect_bottom.y - 10;
     }
     SDL_RenderFillRect(m_renderer, &m_rect);
-
-
-
-
-
-
-
-
 
 
     // Draw text in button
@@ -110,22 +121,38 @@ void Button::draw()
     SDL_DestroyTexture(textTexture);
 }
 
-void Button::draw(int a)
+void Button::draw(Uint8 alpha)
 {
     if (m_hovered)
     {
-        text_b->setTextColor({ 60, 88, 160, 200 });
-        sprite_b->setAlpha(100);
+        text_b->setTextColor({ 60, 88, 160, alpha });
+        sprite_b->setAlpha(alpha);
     }
     else
     {
         text_b->setTextColor({ 60, 88, 160, 255 });
         sprite_b->setAlpha(255);
     }
- 
-    text_b->draw(1);
+    
+    text_b->draw(alpha);
     sprite_b->render();
 
+}
+
+void Button::drawSpriteButton()
+{
+    sprite_b->setY(static_cast<float>(m_rect.y));
+    sprite_b->setX(static_cast<float>(m_rect.x));
+
+    if (m_hovered)
+    {
+        sprite_b->setAlpha(200);
+    }
+    else
+    {
+        sprite_b->setAlpha(255);
+    }
+    sprite_b->render();
 }
 
 void Button::setPosition(int x, int y)

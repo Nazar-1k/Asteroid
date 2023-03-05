@@ -142,6 +142,7 @@ void Particle::render()
     // Show image
     Texture->render(x,y);
 
+
     //Show shimmer
     if (Frame % 2 == 0)
     {
@@ -160,3 +161,9 @@ void Particle::setdead(bool dead)
 {
 	this->dead = dead;
 }
+
+void Particle::setAlfa(Uint8 alpha)
+{
+	Texture->setAlpha(alpha);
+}
+
