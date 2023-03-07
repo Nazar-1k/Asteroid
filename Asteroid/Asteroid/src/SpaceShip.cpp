@@ -148,6 +148,11 @@ void  Ship::starSet(int s_width, int s_heigth)
     }
 }
 
+void Ship::setLife(int life)
+{
+    count_life = life;
+}
+
 void Ship::takeLife()
 {
     if (count_life>=0)
@@ -158,8 +163,6 @@ void Ship::setDead(bool dead)
 {
     this->dead = dead;
 }
-
-
 
 void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
 { 

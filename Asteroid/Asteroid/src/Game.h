@@ -1,6 +1,14 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <sstream>
+
+
+
 #include "Background.h"
 #include "Arrow.h"
 #include "Asteroid.h"
@@ -8,8 +16,14 @@
 #include "DestroyParticles.h"
 #include "Button.h"
 #include "Text.h"
-#include <vector>
 
+
+
+struct Player
+{
+	std::string name;
+	int points;
+};
 
 class Game
 {
@@ -43,6 +57,7 @@ private:
 
 	void renderMainMenu();
 	void renderGameInterface();
+	void renderBestScore();
 
 
 	void deleteObject();
@@ -65,6 +80,8 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
+	SDL_Surface* icon;
+
 	#pragma endregion
 
 	#pragma region Sprites
@@ -80,6 +97,7 @@ private:
 	#pragma endregion
 
 	#pragma region Main_menu
+
 	std::unique_ptr<Text> Asteroid_main_menu_text;
 	
 	std::unique_ptr<Button> pLay_button;
@@ -94,7 +112,42 @@ private:
 
 	bool setings;
 	bool info;
-	bool score;
+	bool bestsRecord;
+
+	#pragma region BestRecord
+
+	SDL_Rect BestRecordMenu;
+
+	std::unique_ptr<Text> BestRecord_text;
+
+	std::unique_ptr<Text> FirstRecord_text;
+	std::unique_ptr<Text> SecondRecord_text;
+	std::unique_ptr<Text> ThirdRecord_text;
+	std::unique_ptr<Text> FourthRecord_text;
+	std::unique_ptr<Text> FifthRecord_text;
+
+	std::unique_ptr<Button> closeRecord_button;
+
+	bool closeRecord;
+
+	#pragma region recordMethods
+	std::vector<Player> players;
+	// Function for comparing players by number of points
+	static bool compare_players(Player& p1, Player& p2){ return p1.points > p2.points; }
+		
+
+	void addRecord(std::string new_name, int new_points);
+
+	std::vector<Player> read_players(std::string filename);
+
+
+	// Function to read data about players from a file
+	void write_players(std::string filename, std::vector<Player> players);
+
+	void SetBestRecord();
+	#pragma endregion
+
+	#pragma endregion
 
 	#pragma endregion
 

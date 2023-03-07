@@ -23,6 +23,7 @@ public:
 	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
 
 	int getLife() const { return count_life; }
+	void setLife(int life);
 	void takeLife();
 
 	bool isDead() const { return dead; }

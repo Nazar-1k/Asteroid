@@ -3,7 +3,7 @@
 Game::Game()
 	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
 	window(nullptr), renderer(nullptr), bg(nullptr),
-	 menu(true), game(false), stop_menu(false), setings(false), info(false), score(false), score_points(0), gameover(false)
+	 menu(true), game(false), stop_menu(false), setings(false), info(false),  score_points(0), gameover(false)
 {
 	
 }
@@ -15,8 +15,10 @@ Game::~Game()
 
 bool Game::init()
 {
+
 	if (!initWindow() or !initeObject() or !initButton())
 		return false;
+
 	return true;
 }
 
@@ -39,6 +41,7 @@ void Game::update()
 			moveAsteroid();
 			
 			updateBullets();
+				
 		}
 		
 	}
@@ -64,8 +67,9 @@ void Game::render()
 		else if (info)
 		{
 		}
-		else if(score)
+		else if(bestsRecord)
 		{
+			renderBestScore();
 		}
 	}
 	else if (game)
@@ -95,7 +99,7 @@ void Game::pollEventWindow()
 		if (e.type == SDL_MOUSEBUTTONDOWN)
 		{
 			
-			if (e.button.button == SDL_BUTTON_LEFT) 
+			if (e.button.button == SDL_BUTTON_LEFT and game) 
 			{
 				if(!stop_menu)
 					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
@@ -118,6 +122,7 @@ void Game::pollEventWindow()
 		restart_button_->handleEvent(e, arrow->getX(), arrow->getY());
 		back_button_->handleEvent(e, arrow->getX(), arrow->getY());
 
+		closeRecord_button->handleEvent(e, arrow->getX(), arrow->getY());
 
 		if (e.type == SDL_MOUSEBUTTONDOWN)
 		{
@@ -127,28 +132,56 @@ void Game::pollEventWindow()
 			#pragma region MenuButton
 				if (menu)
 				{
-					if (pLay_button->isPressed())
+					if (bestsRecord == false and info == false and setings == false)
 					{
-						game = true;
-						menu = false;
-						deleteObject();
+						if (pLay_button->isPressed())
+						{
+							game = true;
+							menu = false;
+							deleteObject();
+							ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
+						}
+						else if (quit_button->isPressed())
+						{
+							quit = true;
+						}
 					}
-					else if (quit_button->isPressed())
+					if (setings_button->isPressed())
 					{
-						quit = true;
-					}
-					else if (setings_button->isPressed())
-					{
-
+						if (!info)
+							info = true;
+						else if (info)
+							info = false;
+						bestsRecord = false;
+						setings = false;
 					}
 					else if (score_button->isPressed())
 					{
-
+						SetBestRecord();
+						if(!bestsRecord)
+							bestsRecord = true;
+						else if (bestsRecord)
+							bestsRecord = false;
+						info = false;
+						setings = false;
 					}
 					else if (info_button->isPressed())
 					{
-
+						if (!info)
+							info = true;
+						else if (info)
+							info = false;
+						bestsRecord = false;
+						setings = false;
 					}
+
+					//close bestRecord
+					if (bestsRecord)
+					{
+						if(closeRecord_button->isPressed())
+							bestsRecord = false;
+					}
+
 				}
 
 #pragma endregion
@@ -156,14 +189,14 @@ void Game::pollEventWindow()
 			#pragma region GameMenu
 				if (game)
 				{
-					if (stop_button->isPressed())
+					if (stop_button->isPressed() and !gameover)
 					{
 						if (stop_menu == false)
 							stop_menu = true;
 						else if (stop_menu == true)
 							stop_menu = false;
 					}
-					if (stop_menu)
+					if (stop_menu and !gameover)
 					{
 						if (continue_button->isPressed())
 						{
@@ -174,6 +207,7 @@ void Game::pollEventWindow()
 							deleteObject();
 							ship->setDead(true);
 							score_points = 0;
+							ship->setLife(3);
 							ship->starSet(SCREEN_WIDTH,SCREEN_HEIGHT);
 							stop_menu = false;
 						}
@@ -181,6 +215,7 @@ void Game::pollEventWindow()
 						{
 							deleteObject();
 							ship->setDead(true);
+							ship->setLife(3);
 							score_points = 0;
 							menu = true;
 							game = false;
@@ -193,8 +228,8 @@ void Game::pollEventWindow()
 						if (restart_button_->isPressed())
 						{
 							deleteObject();
-							ship->setDead(true);
 							score_points = 0;
+							ship->setLife(3);
 							ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
 							gameover = false;
 							stop_menu = false;
@@ -202,7 +237,7 @@ void Game::pollEventWindow()
 						else if (back_button_->isPressed())
 						{
 							deleteObject();
-							ship->setDead(true);
+							ship->setLife(3);
 							score_points = 0;
 							menu = true;
 							game = false;
@@ -311,6 +346,16 @@ bool Game::initWindow()
 		return false;
 	}
 
+	icon = IMG_Load("data/icon/icon.png");
+	if (!icon)
+	{
+		std::cout << "Icon ERRoR: \n" << std::endl;
+		return false;
+	}
+	SDL_SetWindowIcon(window, icon);
+
+	
+
 	showCursor(false);
 
 	return true;
@@ -335,7 +380,7 @@ bool Game::initButton()
 	
 #pragma region MainMenu
 
-
+	#pragma region MainButton
 	Asteroid_main_menu_text = std::unique_ptr<Text>(new Text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4, renderer, "Asteroid", 80, { 89, 104, 130, 255 }));
 
 	pLay_button = std::unique_ptr<Button>(new Button{ renderer, "Play", {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 250, 100}});
@@ -349,7 +394,26 @@ bool Game::initButton()
 	info_button = std::unique_ptr<Button>(new Button{ renderer, SCREEN_WIDTH - SCREEN_WIDTH / 15, SCREEN_HEIGHT - SCREEN_HEIGHT / 10,"data/Menu/info1.png" });
 	setings_button = std::unique_ptr<Button>(new Button{ renderer, SCREEN_WIDTH - SCREEN_WIDTH /15 - info_button->getWidth() - info_button->getWidth(), SCREEN_HEIGHT - SCREEN_HEIGHT / 10,"data/Menu/setings1.png"});
 	score_button = std::unique_ptr<Button>(new Button{ renderer, SCREEN_WIDTH - SCREEN_WIDTH / 15 - info_button->getWidth() - info_button->getWidth() - setings_button->getWidth() - info_button->getWidth() / 2, SCREEN_HEIGHT - SCREEN_HEIGHT / 10,"data/Menu/score1.png"});
+	#pragma endregion
+
+	#pragma region RecordMenu
+
+
+	BestRecordMenu = { SCREEN_WIDTH / 6 ,  SCREEN_HEIGHT / 6,SCREEN_WIDTH - SCREEN_WIDTH / 3 ,SCREEN_HEIGHT - SCREEN_HEIGHT / 3 };
+
+	BestRecord_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2, BestRecordMenu.y + 50, renderer, "Best Record:", 40, { 255, 255, 255, 255 } });
+
+	closeRecord_button = std::unique_ptr<Button>(new Button{ renderer, BestRecordMenu.x + BestRecordMenu.w - 30, BestRecordMenu.y + 30 , "data/Menu/close.png" });
+
+	FirstRecord_text  = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 150 , renderer, "1", 25, {255, 255, 255, 255}});
+	SecondRecord_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 200, renderer, "2", 25, { 255, 255, 255, 255 } });
+	ThirdRecord_text  = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 250, renderer, "3", 25, { 255, 255, 255, 255 } });
+	FourthRecord_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 300, renderer, "4", 25, { 255, 255, 255, 255 } });
+	FifthRecord_text  = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 350, renderer, "5", 25, { 255, 255, 255, 255 } });
 	
+	SetBestRecord();
+
+	#pragma endregion
 #pragma endregion
 	
 #pragma region GameInterface
@@ -406,6 +470,7 @@ bool Game::initButton()
 #pragma endregion
 
 #pragma endregion
+
 	return true;
 }
 
@@ -666,22 +731,23 @@ void Game::moveAsteroid()
 
 		if (ship->colideAsteroid(*asteroid) and menu == false)
 		{
-			deleteObject();
-
+			
 			if (ship->getLife() > 0)
 			{
 				ship->takeLife();
 				if (ship->getLife() == 0)
 				{
-					score_points = 0;
 					ship->setDead(true);
 					stop_menu = true;
 					gameover = true;
+					addRecord("SHIP", score_points);
+					/*score_points = 0;*/
 				}
 			}
 			if (gameover == false)
 			{
 				ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
+				deleteObject();
 
 			}
 			
@@ -719,9 +785,10 @@ void Game::moveAsteroid()
 				if (ship->getLife() == 0)
 				{
 					ship->setDead(true);
-					score_points = 0;
 					stop_menu = true;
 					gameover = true;
+					addRecord("SHIP", score_points);
+					/*score_points = 0;*/
 				}
 			}
 			if (gameover == false)
@@ -886,9 +953,106 @@ void Game::renderGameInterface()
 
 }
 
+void Game::renderBestScore()
+{
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 89, 104, 130, static_cast<Uint8>(200));
+	SDL_RenderFillRect(renderer, &BestRecordMenu);
+
+	BestRecord_text->draw();
+
+	closeRecord_button->drawSpriteButton();
+
+	FirstRecord_text->draw();
+	SecondRecord_text->draw();
+	ThirdRecord_text->draw();
+	FourthRecord_text->draw();
+	FifthRecord_text->draw();
+}
+
 void Game::deleteObject()
 {
 	bigAsteroids.clear();
 	smallAsteroids.clear();
 	bullets.clear();
 }
+
+
+
+
+
+
+
+
+//file record
+void  Game::addRecord(std::string new_name, int new_points)
+{
+	bool added = false;
+	for (Player& player : players) {
+		if (player.name == new_name)
+		{
+			added = true;
+			if (new_points > player.points)
+				player.points = new_points;
+
+			break;
+		}
+	}
+
+	if (!added)
+	{
+		players.push_back({ new_name, new_points });
+	}
+
+	// Сортування гравців за кількістю point
+	std::sort(players.begin(), players.end(), compare_players);
+
+	// Запис даних про гравців до файлу
+	write_players(".info/Best_points.txt", players);
+}
+
+std::vector<Player>  Game::read_players(std::string filename) {
+	std::vector<Player> players;
+	std::ifstream fin(filename);
+	if (!fin) {
+		std::cerr << "Error: could not open file " << filename << std::endl;
+		exit(1);
+	}
+	std::string line;
+	while (getline(fin, line)) {
+		if (line.empty()) {
+			continue;
+		}
+		std::stringstream ss(line);
+		std::string name;
+		int points;
+		if (ss >> name && ss >> points && ss.eof()) {
+			players.push_back({ name, points });
+		}
+	}
+	fin.close();
+	return players;
+}
+
+void  Game::write_players(std::string filename, std::vector<Player> players) {
+	std::ofstream fout(filename);
+	if (!fout) {
+		std::cerr << "Error: could not open file " << filename << std::endl;
+		exit(1);
+	}
+	for (Player player : players) {
+		fout << player.name << " " << player.points << std::endl;
+	}
+	fout.close();
+}
+
+void Game::SetBestRecord()
+{
+	players = read_players(".info/Best_points.txt");
+	FirstRecord_text->SetText("1. " + players[0].name + " " + std::to_string(players[0].points) + "\n");
+	SecondRecord_text->SetText("2. " + players[1].name + " " + std::to_string(players[1].points) + "\n");
+	ThirdRecord_text->SetText("3. " + players[2].name + " " + std::to_string(players[2].points) + "\n");
+	FourthRecord_text->SetText("4. " + players[3].name + " " + std::to_string(players[3].points) + "\n");
+	FifthRecord_text->SetText("5. " + players[4].name + " " + std::to_string(players[4].points) + "\n");
+}
+
