@@ -114,5 +114,7 @@ void InputBox::render() {
     }
 
     SDL_RenderCopy(m_renderer, m_texture, NULL, &m_rect);
+    SDL_SetRenderDrawColor(m_renderer, 1, 1, 1, 255);
+    SDL_RenderDrawRect(m_renderer, &m_rect);
 
 }

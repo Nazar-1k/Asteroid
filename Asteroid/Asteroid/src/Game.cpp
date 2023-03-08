@@ -132,6 +132,7 @@ void Game::pollEventWindow()
 		close_button->handleEvent(e, arrow->getX(), arrow->getY());
 
 		Name_Ship->handleEvent(e);
+		check->handleEvent(e);
 
 		if (e.type == SDL_MOUSEBUTTONDOWN)
 		{
@@ -439,7 +440,7 @@ bool Game::initButton()
 	Name_text = std::unique_ptr<Text>(new Text{ SetMenuBG.x + 70, BestRecordMenu.y + 110, renderer, "Name", 25, { 255, 255, 255, 255 } });
 	Name_Ship = std::unique_ptr<InputBox>(new InputBox{ renderer,  SetMenuBG.x + 140 , BestRecordMenu.y + 90 , 300, 50,"font/TerminatorCyr.ttf",  25, {255,255,255,255}, {55, 116, 224,255} });
 	
-	
+	check = std::unique_ptr<CheckBox>(new CheckBox{ renderer, 100,100,25,25 });
 
 	#pragma endregion
 #pragma endregion
@@ -1029,6 +1030,7 @@ void Game::renderSetings()
 
 	Name_Ship->render();
 	Name_text->draw();
+	check->render();
 
 	close_button->drawSpriteButton();
 }

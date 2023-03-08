@@ -17,6 +17,7 @@
 #include "Button.h"
 #include "Text.h"
 #include "TextBox.h"
+#include "CheckBox.h"
 
 
 
@@ -163,6 +164,7 @@ private:
 	std::unique_ptr<Text> Name_text;
 
 	std::unique_ptr<InputBox> Name_Ship;
+	std::unique_ptr<CheckBox> check;
 
 
 
