@@ -3,7 +3,7 @@
 Game::Game()
 	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
 	window(nullptr), renderer(nullptr), bg(nullptr),
-	 menu(true), game(false), stop_menu(false), setings(false), info(false),  score_points(0), gameover(false)
+	 menu(true), game(false), stop_menu(false), setings(false), info(false),  score_points(0), gameover(false), stop(false)
 {
 	
 }
@@ -35,13 +35,14 @@ void Game::update()
 	{
 		if (!stop_menu)
 		{
+			if (!stop)
 			ship->move();
 
 			initAsteroid(5);
 			moveAsteroid();
 			
 			updateBullets();
-				
+			
 		}
 		
 	}
@@ -62,10 +63,11 @@ void Game::render()
 
 		if (setings)
 		{
-
+			renderSetings();
 		}
 		else if (info)
 		{
+			/*renderSetings();*/
 		}
 		else if(bestsRecord)
 		{
@@ -106,6 +108,11 @@ void Game::pollEventWindow()
 			}	
 
 		}
+		if (e.type == SDL_KEYDOWN) 
+			if(e.key.keysym.sym == SDLK_SPACE)
+			{
+					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship }));
+			}
 
 		pLay_button->handleEvent(e, arrow->getX(), arrow->getY());
 		quit_button->handleEvent(e, arrow->getX(), arrow->getY());
@@ -122,7 +129,9 @@ void Game::pollEventWindow()
 		restart_button_->handleEvent(e, arrow->getX(), arrow->getY());
 		back_button_->handleEvent(e, arrow->getX(), arrow->getY());
 
-		closeRecord_button->handleEvent(e, arrow->getX(), arrow->getY());
+		close_button->handleEvent(e, arrow->getX(), arrow->getY());
+
+		Name_Ship->handleEvent(e);
 
 		if (e.type == SDL_MOUSEBUTTONDOWN)
 		{
@@ -148,12 +157,12 @@ void Game::pollEventWindow()
 					}
 					if (setings_button->isPressed())
 					{
-						if (!info)
-							info = true;
-						else if (info)
-							info = false;
+						if (!setings)
+							setings = true;
+						else if (setings)
+							setings = false;
 						bestsRecord = false;
-						setings = false;
+						info = false;
 					}
 					else if (score_button->isPressed())
 					{
@@ -176,11 +185,17 @@ void Game::pollEventWindow()
 					}
 
 					//close bestRecord
-					if (bestsRecord)
+					if (bestsRecord or setings or info)
 					{
-						if(closeRecord_button->isPressed())
+						if (close_button->isPressed())
+						{
 							bestsRecord = false;
+							setings = false;
+							info = false;
+						}
 					}
+
+					
 
 				}
 
@@ -403,7 +418,7 @@ bool Game::initButton()
 
 	BestRecord_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2, BestRecordMenu.y + 50, renderer, "Best Record:", 40, { 255, 255, 255, 255 } });
 
-	closeRecord_button = std::unique_ptr<Button>(new Button{ renderer, BestRecordMenu.x + BestRecordMenu.w - 30, BestRecordMenu.y + 30 , "data/Menu/close.png" });
+	close_button = std::unique_ptr<Button>(new Button{ renderer, BestRecordMenu.x + BestRecordMenu.w - 30, BestRecordMenu.y + 30 , "data/Menu/close.png" });
 
 	FirstRecord_text  = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 150 , renderer, "1", 25, {255, 255, 255, 255}});
 	SecondRecord_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 200, renderer, "2", 25, { 255, 255, 255, 255 } });
@@ -412,6 +427,19 @@ bool Game::initButton()
 	FifthRecord_text  = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2,BestRecordMenu.y + 350, renderer, "5", 25, { 255, 255, 255, 255 } });
 	
 	SetBestRecord();
+
+	#pragma endregion
+
+	#pragma region SetMenu
+
+	SetMenuBG = { SCREEN_WIDTH / 6 ,  SCREEN_HEIGHT / 6,SCREEN_WIDTH - SCREEN_WIDTH / 3 ,SCREEN_HEIGHT - SCREEN_HEIGHT / 4 };
+
+	Set_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2, BestRecordMenu.y + 50, renderer, "Settings", 40, { 255, 255, 255, 255 } });
+	
+	Name_text = std::unique_ptr<Text>(new Text{ SetMenuBG.x + 70, BestRecordMenu.y + 110, renderer, "Name", 25, { 255, 255, 255, 255 } });
+	Name_Ship = std::unique_ptr<InputBox>(new InputBox{ renderer,  SetMenuBG.x + 140 , BestRecordMenu.y + 90 , 300, 50,"font/TerminatorCyr.ttf",  25, {255,255,255,255}, {55, 116, 224,255} });
+	
+	
 
 	#pragma endregion
 #pragma endregion
@@ -726,31 +754,13 @@ void Game::moveAsteroid()
 	//BIG Asteroid
 	for (auto& asteroid : bigAsteroids)
 	{
+		if(!stop)
 		asteroid->move();
 #pragma region colideBigAsteroid__SHIP
 
 		if (ship->colideAsteroid(*asteroid) and menu == false)
 		{
-			
-			if (ship->getLife() > 0)
-			{
-				ship->takeLife();
-				if (ship->getLife() == 0)
-				{
-					ship->setDead(true);
-					stop_menu = true;
-					gameover = true;
-					addRecord("SHIP", score_points);
-					/*score_points = 0;*/
-				}
-			}
-			if (gameover == false)
-			{
-				ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
-				deleteObject();
-
-			}
-			
+			destroyShip();
 		}
 #pragma endregion
 
@@ -773,30 +783,12 @@ void Game::moveAsteroid()
 	//Small Asteroid
 	for (auto& asteroid : smallAsteroids)
 	{
+		if (!stop)
 		asteroid->move();
 #pragma region colide_SHIP
 		if (ship->colideAsteroid(*asteroid) and menu == false)
 		{
-
-
-			if (ship->getLife() > 0)
-			{
-				ship->takeLife();
-				if (ship->getLife() == 0)
-				{
-					ship->setDead(true);
-					stop_menu = true;
-					gameover = true;
-					addRecord("SHIP", score_points);
-					/*score_points = 0;*/
-				}
-			}
-			if (gameover == false)
-			{
-				ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
-				deleteObject();
-
-			}
+			destroyShip();
 		}
 #pragma endregion
 
@@ -854,6 +846,47 @@ void Game::moveAsteroid()
 	#pragma endregion
 }
 
+void Game::destroyShip()
+{
+	
+	if (destroyShip_particle.size() <= 5 and !stop)
+		destroyShip_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ ship->getX(), ship->getY() , ship->getWidth() / 15 ,10000, renderer }));
+	
+	if (ship->getLife() > 0)
+	{
+		if (ship->getLife() == 1)
+		{
+			ship->takeLife();
+			ship->setAlpha(0);
+		
+			addRecord("SHIP", score_points);
+			
+			stop_menu = true;
+			gameover = true;
+
+		}
+	}
+	
+	if (!gameover)
+	{
+		if (destroyShip_particle.empty())
+		{
+			ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
+			deleteObject();
+			
+			ship->takeLife();
+			stop = false;
+		}
+		else
+		{
+			ship->setAlpha(0);
+			stop = true;
+		}
+
+	}
+
+}
+
 void Game::renderBullets()
 {
 	if (!destroy_particle.empty())
@@ -868,7 +901,20 @@ void Game::renderBullets()
 
 		}
 	}
+	if (!destroyShip_particle.empty())
+	{
+		for (size_t i = 0; i < destroyShip_particle.size(); i++)
+		{
+			destroyShip_particle[i]->render();
+			if (destroyShip_particle[i]->getOut())
+			{
+				destroyShip_particle.erase(destroyShip_particle.begin() + i);
+			}
 
+		}
+	}
+
+	if (!stop)
 	for (size_t i = 0; i < bullets.size(); i++)
 	{
 		if (bullets[i]->isActive())
@@ -882,6 +928,7 @@ void Game::updateBullets()
 {
 	for (auto& bullet : bullets)
 	{
+		if(!stop)
 		bullet->move(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 }
@@ -961,7 +1008,7 @@ void Game::renderBestScore()
 
 	BestRecord_text->draw();
 
-	closeRecord_button->drawSpriteButton();
+	close_button->drawSpriteButton();
 
 	FirstRecord_text->draw();
 	SecondRecord_text->draw();
@@ -970,19 +1017,28 @@ void Game::renderBestScore()
 	FifthRecord_text->draw();
 }
 
+void Game::renderSetings()
+{
+
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 89, 104, 130, static_cast<Uint8>(200));
+	SDL_RenderFillRect(renderer, &SetMenuBG);
+
+	Set_text->draw();
+
+
+	Name_Ship->render();
+	Name_text->draw();
+
+	close_button->drawSpriteButton();
+}
+
 void Game::deleteObject()
 {
 	bigAsteroids.clear();
 	smallAsteroids.clear();
 	bullets.clear();
 }
-
-
-
-
-
-
-
 
 //file record
 void  Game::addRecord(std::string new_name, int new_points)

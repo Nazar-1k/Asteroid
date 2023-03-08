@@ -131,6 +131,7 @@ void Ship::move()
 
     #pragma endregion
 
+
 }
 
 void  Ship::starSet(int s_width, int s_heigth)
@@ -146,6 +147,7 @@ void  Ship::starSet(int s_width, int s_heigth)
         count_life = 3;
         dead = false;
     }
+    setAlpha(255);
 }
 
 void Ship::setLife(int life)
@@ -165,7 +167,8 @@ void Ship::setDead(bool dead)
 }
 
 void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
-{ 
+{
+   
         angle = this->angle;
         //Set rendering space and render to screen
         SDL_Rect renderQuad = { static_cast<int>(x - width / 2),  static_cast<int>(y - height / 2), width, height };
@@ -193,8 +196,6 @@ void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFl
 
         //Render to screen
         SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
-
-
         renderParticles();
     
 }

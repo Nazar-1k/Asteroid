@@ -16,6 +16,7 @@
 #include "DestroyParticles.h"
 #include "Button.h"
 #include "Text.h"
+#include "TextBox.h"
 
 
 
@@ -58,7 +59,7 @@ private:
 	void renderMainMenu();
 	void renderGameInterface();
 	void renderBestScore();
-
+	void renderSetings();
 
 	void deleteObject();
 
@@ -94,6 +95,10 @@ private:
 	std::vector<std::unique_ptr<Bullet>> bullets;
 	std::vector<std::unique_ptr<DestroyParticles>> destroy_particle;
 
+	void destroyShip();
+	std::vector<std::unique_ptr<DestroyParticles>> destroyShip_particle;
+	bool stop;
+
 	#pragma endregion
 
 	#pragma region Main_menu
@@ -126,7 +131,7 @@ private:
 	std::unique_ptr<Text> FourthRecord_text;
 	std::unique_ptr<Text> FifthRecord_text;
 
-	std::unique_ptr<Button> closeRecord_button;
+	std::unique_ptr<Button> close_button;
 
 	bool closeRecord;
 
@@ -146,6 +151,30 @@ private:
 
 	void SetBestRecord();
 	#pragma endregion
+
+	#pragma endregion
+
+	#pragma region Setings
+
+	SDL_Rect SetMenuBG;
+
+	std::unique_ptr<Text> Set_text;
+
+	std::unique_ptr<Text> Name_text;
+
+	std::unique_ptr<InputBox> Name_Ship;
+
+
+
+
+
+
+
+	std::unique_ptr<Button> closeSet_button;
+	bool closeSet;
+
+
+
 
 	#pragma endregion
 

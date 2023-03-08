@@ -10,6 +10,11 @@ Bullet::Bullet(SDL_Renderer* renderer, Ship& ship, Arrow& arrow)
     initSprite(path, renderer);
     creatBullet(ship, arrow);
 }
+Bullet::Bullet(SDL_Renderer* renderer, Ship& ship)
+{
+    initSprite(path, renderer);
+    creatBullet(ship);
+}
 
 void Bullet::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
 {
@@ -43,6 +48,24 @@ void Bullet::creatBullet(Ship& Ship, Arrow& arrow)
     dy = arrow.y - Ship.y;
     angle = static_cast<float>(atan2(dy, dx) / M_PI*180);
 
+    float angle = atan2(dy, dx);
+
+    dx = bulletSpeed * cos(angle);
+    dy = bulletSpeed * sin(angle);
+
+    is_bullet_active = true;
+}
+
+void Bullet::creatBullet(Ship& Ship)
+{
+    x = Ship.x;
+    y = Ship.y;
+    angle = Ship.angle * 3.14159 / 180;
+
+    dx = static_cast<float>(sin(angle ) * bulletSpeed );
+    dy = static_cast<float>(-cos(angle ) * bulletSpeed );
+
+    angle = static_cast<float>(atan2(dy, dx) / M_PI * 180);
     is_bullet_active = true;
 }
 
@@ -50,13 +73,9 @@ void Bullet::move(int w_screen, int h_screen)
 {
     if (is_bullet_active)
     {
-        float angle = atan2(dy, dx);
-        float bulletSpeed = 10.0;
-        float bulletVelocityX = bulletSpeed * cos(angle);
-        float bulletVelocityY = bulletSpeed * sin(angle);
-
-        x += bulletVelocityX;
-        y += bulletVelocityY;
+       
+        x += dx;
+        y += dy;
 
         if (x < 0 || x > w_screen)
             is_bullet_active = false;

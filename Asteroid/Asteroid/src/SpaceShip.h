@@ -3,6 +3,8 @@
 #include "Particale.h"
 #include <SDL_mixer.h>
 #include "Bullet.h"
+#include "DestroyParticles.h"
+#include <vector>
 
 class Asteroid;
 class Arrow;
@@ -21,6 +23,7 @@ public:
 	bool colideAsteroid(Asteroid& ast);
 
 	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
+	friend void Bullet::creatBullet(Ship& Ship);
 
 	int getLife() const { return count_life; }
 	void setLife(int life);
@@ -42,6 +45,8 @@ private:
 
 	bool dead;
 	int count_life;
+
+
 
 	//Particle count
 	static const int TOTAL_PARTICLES = 20;

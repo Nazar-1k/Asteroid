@@ -5,6 +5,7 @@
 class DestroyParticles
 {
 public:
+	DestroyParticles(float x, float y, int side, int angle, SDL_Renderer* renderer);
 	DestroyParticles(float x, float y, int side, SDL_Renderer* renderer);
 	~DestroyParticles();
 

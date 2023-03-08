@@ -11,6 +11,17 @@ DestroyParticles::DestroyParticles(float x, float y, int side, SDL_Renderer* ren
     timer = std::unique_ptr<Timer>(new Timer);
 }
 
+DestroyParticles::DestroyParticles(float x, float y, int side,int angle , SDL_Renderer* renderer)
+    :time_out(false), x(x), y(y), side(side), renderer(renderer), out(false)
+{
+    //Initialize particles
+    for (int i = 0; i < TOTAL_PARTICLES; ++i)
+    {
+        particles[i] = new Particle(x, y, side,angle, renderer);
+    }
+    timer = std::unique_ptr<Timer>(new Timer);
+}
+
 DestroyParticles::~DestroyParticles()
 {
 	//Delete particles
