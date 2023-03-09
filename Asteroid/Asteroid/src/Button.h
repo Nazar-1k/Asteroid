@@ -9,6 +9,7 @@
 class Button {
 public:
     Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect);
+    Button(SDL_Renderer* renderer, int x, int y, std::string text,int size, SDL_Color clorText);
     Button(SDL_Renderer* renderer, std::string text, int x, int y, const char path[], SDL_Color clor);
     Button(SDL_Renderer* renderer, int x, int y, const char path[]);
     ~Button();
@@ -18,6 +19,7 @@ public:
     void draw();
     void draw(Uint8 alpha);
     void drawSpriteButton();
+    void drawTextButton();
 
     bool isMouseOver(float mouseX, float mouseY) const;
     bool isPressed() const;
@@ -52,6 +54,8 @@ private:
     bool m_hovered = false;
     SDL_Color m_hoveredRectColor;
     bool m_isPressed;
+
+    bool active = false;
 
     
 

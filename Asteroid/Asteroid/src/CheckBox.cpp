@@ -18,7 +18,7 @@ void CheckBox::render() {
     SDL_SetRenderDrawColor(m_renderer, 55, 116, 224,255);
     SDL_RenderFillRect(m_renderer, &m_rect);
 
-    SDL_SetRenderDrawColor(m_renderer, 1, 1, 1, 255);
+    SDL_SetRenderDrawColor(m_renderer, 255, 1, 1, 255);
     SDL_RenderDrawRect(m_renderer, &m_rect);
 
     }
@@ -27,7 +27,7 @@ void CheckBox::render() {
         SDL_SetRenderDrawColor(m_renderer, 55, 116, 224-50, 255);
         SDL_RenderFillRect(m_renderer, &m_rect);
 
-        SDL_SetRenderDrawColor(m_renderer, 1, 1, 1, 255);
+        SDL_SetRenderDrawColor(m_renderer, 1, 255, 1, 255);
         SDL_RenderDrawLine(m_renderer, m_rect.x, m_rect.y, m_rect.x + m_rect.w, m_rect.y + m_rect.h);
         SDL_RenderDrawLine(m_renderer, m_rect.x, m_rect.y + m_rect.h, m_rect.x + m_rect.w, m_rect.y);
     }

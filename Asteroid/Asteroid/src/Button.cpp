@@ -28,6 +28,20 @@ Button::Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect)
     m_rect_bottom = { m_rect.x + 10, m_rect.y + 10, m_rect.w, m_rect.h };
 }
 
+Button::Button(SDL_Renderer* renderer, int x, int y, std::string text,int size, SDL_Color colorText)
+    : m_renderer(renderer), m_text(text), m_textColor(colorText)
+{
+    text_b = std::unique_ptr<Text>(new Text{ x , y  , m_renderer , m_text, size , { 0, 0, 0, 255 } });
+    if (!text_b)
+    {
+        std::cout << "123123123";
+   }
+    m_rect = { x,y,text_b->getWidth(), text_b->getHeight() };
+    
+    m_rect.x -= m_rect.w / 2;
+    m_rect.y -= m_rect.h / 2;
+}
+
 Button::Button(SDL_Renderer* renderer, std::string text, int x, int y, const char path[], SDL_Color color)
     : m_renderer(renderer), m_text(text)
 {
@@ -153,6 +167,25 @@ void Button::drawSpriteButton()
         sprite_b->setAlpha(255);
     }
     sprite_b->render();
+}
+
+void Button::drawTextButton()
+{
+    if (active)
+    {
+        text_b->setTextColor({ 1, 1, 255, 255 });
+    }
+    if (m_hovered and !active)
+    {
+        text_b->setTextColor({ 255, 255, 255, 100 });
+      
+    }
+    else if(!m_hovered and !active)
+    {
+        text_b->setTextColor({ 255, 255, 255, 255 });
+    }
+    text_b->draw();
+  
 }
 
 void Button::setPosition(int x, int y)

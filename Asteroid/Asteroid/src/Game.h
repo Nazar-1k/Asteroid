@@ -164,7 +164,32 @@ private:
 	std::unique_ptr<Text> Name_text;
 
 	std::unique_ptr<InputBox> Name_Ship;
-	std::unique_ptr<CheckBox> check;
+
+	std::unique_ptr<Text> Shot_text;
+
+	std::unique_ptr<Text> ShotMouse_text;
+	std::unique_ptr<CheckBox> ShotMouse_check;
+
+	std::unique_ptr<Text> ShotSpace_text;
+	std::unique_ptr<CheckBox> ShotSpace_check;
+
+	std::unique_ptr<Text> Sound_text;
+
+	std::unique_ptr<Text> Musik_text;
+	std::unique_ptr<CheckBox> Musik_check;
+
+	std::unique_ptr<Text> Effect_text;
+	std::unique_ptr<CheckBox> Efeckt_check;
+
+	std::unique_ptr<Text> ScreenSize_text;
+
+	std::unique_ptr<Button> Size500x300_button;
+	std::unique_ptr<Button> Size1000x600_button;
+	std::unique_ptr<Button> SizeFullScreen_button;
+
+
+
+
 
 
 

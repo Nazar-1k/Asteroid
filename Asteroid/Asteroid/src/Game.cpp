@@ -132,7 +132,15 @@ void Game::pollEventWindow()
 		close_button->handleEvent(e, arrow->getX(), arrow->getY());
 
 		Name_Ship->handleEvent(e);
-		check->handleEvent(e);
+
+		ShotMouse_check->handleEvent(e);
+		ShotSpace_check->handleEvent(e);
+		Musik_check->handleEvent(e);
+		Efeckt_check->handleEvent(e);
+
+		Size500x300_button->handleEvent(e, arrow->getX(), arrow->getY());
+		Size1000x600_button->handleEvent(e, arrow->getX(), arrow->getY());
+		SizeFullScreen_button->handleEvent(e, arrow->getX(), arrow->getY());
 
 		if (e.type == SDL_MOUSEBUTTONDOWN)
 		{
@@ -440,7 +448,29 @@ bool Game::initButton()
 	Name_text = std::unique_ptr<Text>(new Text{ SetMenuBG.x + 70, BestRecordMenu.y + 110, renderer, "Name", 25, { 255, 255, 255, 255 } });
 	Name_Ship = std::unique_ptr<InputBox>(new InputBox{ renderer,  SetMenuBG.x + 140 , BestRecordMenu.y + 90 , 300, 50,"font/TerminatorCyr.ttf",  25, {255,255,255,255}, {55, 116, 224,255} });
 	
-	check = std::unique_ptr<CheckBox>(new CheckBox{ renderer, 100,100,25,25 });
+	Shot_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 - 150, BestRecordMenu.y + 180, renderer, "Shot", 25, { 255, 255, 255, 255 } });//
+
+	ShotMouse_text = std::unique_ptr<Text>(new Text{ SetMenuBG.x + 170,BestRecordMenu.y + 220, renderer, "Mouse", 20, { 255, 255, 255, 255 } });//
+	ShotMouse_check = std::unique_ptr<CheckBox>(new CheckBox{ renderer,  SetMenuBG.x + 70,BestRecordMenu.y + 210,25,25 });
+
+	ShotSpace_text = std::unique_ptr<Text>(new Text{ SetMenuBG.x + 170, BestRecordMenu.y + 260, renderer, "Space", 20, { 255, 255, 255, 255 } });//
+	ShotSpace_check = std::unique_ptr<CheckBox>(new CheckBox{ renderer,  SetMenuBG.x + 70,BestRecordMenu.y + 250,25,25 });
+
+	Sound_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 + 150,  BestRecordMenu.y + 180, renderer, "Sound", 25, { 255, 255, 255, 255 } });;//
+
+	Musik_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 + 110,BestRecordMenu.y + 220, renderer, "Musik", 20, { 255, 255, 255, 255 } });//
+	Musik_check = std::unique_ptr<CheckBox>(new CheckBox{ renderer, SCREEN_WIDTH / 2 + 20,BestRecordMenu.y + 210,25,25 });
+
+	Effect_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 + 130, BestRecordMenu.y + 260, renderer, "Effect", 20, { 255, 255, 255, 255 } });//
+	Efeckt_check = std::unique_ptr<CheckBox>(new CheckBox{ renderer, SCREEN_WIDTH / 2 + 20,BestRecordMenu.y + 250,25,25 });
+
+	ScreenSize_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 , BestRecordMenu.y + 320, renderer, "Screen Size", 25, { 255, 255, 255, 255 } });//
+
+	Size500x300_button = std::unique_ptr<Button>(new Button{ renderer,BestRecordMenu.x+100,BestRecordMenu.y + 360, "500x300",20,{ 0, 0, 0, 255 } });
+	Size1000x600_button = std::unique_ptr<Button>(new Button{ renderer,SCREEN_WIDTH / 2-50,BestRecordMenu.y + 360, "1000x600",20,{ 0, 0, 0, 255 } });
+	SizeFullScreen_button = std::unique_ptr<Button>(new Button{ renderer,SCREEN_WIDTH / 2+200,BestRecordMenu.y + 360, "Full Screen",20,{ 0, 0, 0, 255 } });
+
+
 
 	#pragma endregion
 #pragma endregion
@@ -1030,7 +1060,29 @@ void Game::renderSetings()
 
 	Name_Ship->render();
 	Name_text->draw();
-	check->render();
+	
+
+	Shot_text->draw();
+
+	ShotMouse_text->draw();
+	ShotMouse_check->render();
+
+	ShotSpace_text->draw();
+	ShotSpace_check->render();
+
+	Sound_text->draw();
+
+	Musik_text->draw();
+	Musik_check->render();
+
+	Effect_text->draw();
+	Efeckt_check->render();
+
+	ScreenSize_text->draw();
+
+	Size500x300_button->drawTextButton();
+	Size1000x600_button->drawTextButton();
+	SizeFullScreen_button->drawTextButton();
 
 	close_button->drawSpriteButton();
 }
