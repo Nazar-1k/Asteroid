@@ -64,6 +64,8 @@ private:
 
 	void deleteObject();
 
+
+
 	#pragma region Window
 	
 	int SCREEN_WIDTH;
@@ -91,8 +93,8 @@ private:
 	std::unique_ptr<BG> bg;
 	std::unique_ptr<Ship> ship;
 	std::unique_ptr<Arrow> arrow;
-	std::vector<std::unique_ptr<Asteroid>> bigAsteroids;
-	std::vector<std::unique_ptr<Asteroid>> smallAsteroids;
+	std::vector<std::unique_ptr<Asteroid>> Asteroids;
+
 	std::vector<std::unique_ptr<Bullet>> bullets;
 	std::vector<std::unique_ptr<DestroyParticles>> destroy_particle;
 
@@ -249,8 +251,46 @@ private:
 	#pragma endregion
 	
 #pragma endregion
+
+	//force 
 	
+	void aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
+
+	void aimBullet(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids)
+	{
+		
+		double closestDistance = std::numeric_limits<double>::max();
+		SDL_Point closestAsteroidPos = { 0, 0 };
+
+		// перебираємо всі астероїди на екрані
+		for (const auto& asteroid : asteroids) {
+			SDL_Point asteroidPos = { asteroid->getX(), asteroid->getY() };
+
+			// обчислюємо відстань між кулею та поточним астероїдом
+			double distance = std::sqrt(std::pow(asteroidPos.x - bullet.getX(), 2) +
+				std::pow(asteroidPos.y - bullet.getY(), 2));
+
+			// обираємо астероїд з найменшою відстанню до кулі
+			if (distance < closestDistance) {
+				closestDistance = distance;
+				closestAsteroidPos = asteroidPos;
+			}
+		}
+
+		// наводимо кулю на знайдений найближчий астероїд
+		if (closestAsteroidPos.x > 0 or   closestAsteroidPos.y > 0)
+		{
+
+			bullet.SeekTarget(closestAsteroidPos.x, closestAsteroidPos.y);
+		}
+		else
+		{
+			bullet.setColor(255, 255, 255);
+		} 
+
+		
+	}
+
 
 
 };
-

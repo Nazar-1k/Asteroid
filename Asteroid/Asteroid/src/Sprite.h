@@ -39,6 +39,7 @@ public:
 
 	float getX() { return x; }
 	float getY() { return y; }
+	
 
 	void setRenderer(SDL_Renderer* renderer);
 

@@ -73,9 +73,10 @@ void Bullet::move(int w_screen, int h_screen)
 {
     if (is_bullet_active)
     {
-       
-        x += dx;
-        y += dy;
+        x += bulletSpeed * cos(angle * M_PI / 180);
+        y += bulletSpeed * sin(angle * M_PI / 180);
+        /*x += dx;
+        y += dy;*/
 
         if (x < 0 || x > w_screen)
             is_bullet_active = false;

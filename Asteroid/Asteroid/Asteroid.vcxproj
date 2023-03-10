@@ -152,6 +152,7 @@
     <ClCompile Include="src\Asteroid.cpp" />
     <ClCompile Include="src\Button.cpp" />
     <ClCompile Include="src\DestroyParticles.cpp" />
+    <ClCompile Include="src\Force.cpp" />
     <ClCompile Include="src\Particale.cpp" />
     <ClCompile Include="src\Background.cpp" />
     <ClCompile Include="src\Game.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="src\TextBox.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Force.h" />
     <ClInclude Include="src\CheckBox.h" />
     <ClInclude Include="src\Button.h" />
     <ClInclude Include="src\DestroyParticles.h" />
