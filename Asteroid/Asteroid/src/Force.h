@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "SpaceShip.h"
 #include <functional>
+#include "Timer.h"
 
 class Ship;
 
@@ -16,12 +17,18 @@ public:
 	
 	void ActiveForce(std::function<void()> func1, std::function<void()> func2, std::function<void()> func3, std::function<void()> func4);
 	
+	void render(int s_width, int s_height);
 
 private:
+	Timer timer;
+
 	int countForce;
+
+	bool isShow;
+	bool isTake;
+
 
 	SDL_Rect rect;
 
 	SDL_Renderer* renderer;
-	Sprite sprite;
 };

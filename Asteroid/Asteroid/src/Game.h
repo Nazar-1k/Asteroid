@@ -253,6 +253,40 @@ private:
 #pragma endregion
 
 	//force 
+	bool isShield = false;
+	void createShield(float centerX, float centerY, int radius) {
+		isShield = true;
+		SDL_Rect fillRect = { centerX - radius, centerY - radius, radius * 2, radius * 2 };
+		
+
+		// Вираховуємо координати точок на колі
+		int x = 0;
+		int y = radius;
+		int d = 3 - 2 * radius;
+
+		// Рисуємо коло
+		while (y >= x) {
+			// 8 точок симетричні відносно центра кола
+			SDL_RenderDrawPoint(renderer, centerX + x, centerY + y);
+			SDL_RenderDrawPoint(renderer, centerX + x, centerY - y);
+			SDL_RenderDrawPoint(renderer, centerX - x, centerY + y);
+			SDL_RenderDrawPoint(renderer, centerX - x, centerY - y);
+			SDL_RenderDrawPoint(renderer, centerX + y, centerY + x);
+			SDL_RenderDrawPoint(renderer, centerX + y, centerY - x);
+			SDL_RenderDrawPoint(renderer, centerX - y, centerY + x);
+			SDL_RenderDrawPoint(renderer, centerX - y, centerY - x);
+
+			// Оновлюємо значення d та координат точок
+			if (d < 0) {
+				d = d + 4 * x + 6;
+			}
+			else {
+				d = d + 4 * (x - y) + 10;
+				y--;
+			}
+			x++;
+		}
+	}
 	
 	void aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
 
@@ -291,6 +325,7 @@ private:
 		
 	}
 
+	void Score100() { score_points += 100; }
 
 
 };

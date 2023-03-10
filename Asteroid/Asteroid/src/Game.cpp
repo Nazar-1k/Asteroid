@@ -38,8 +38,9 @@ void Game::update()
 			
 			if (!stop)
 			ship->move();
-
-			initAsteroid(5);///
+			
+			
+			initAsteroid(20);///
 			moveAsteroid();
 			
 			/*Asteroids[1]->setX(0);
@@ -103,6 +104,8 @@ void Game::render()
 		renderGameInterface();
 	}
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	/*createShield(ship->getX(), ship->getY(), ship->getHeight() / 2 + 8);*/
 
 	SDL_RenderPresent(renderer);
 }
@@ -1085,6 +1088,7 @@ void Game::deleteObject()
 {
 	Asteroids.clear();
 	bullets.clear();
+	stop = false;
 }
 
 //file record
