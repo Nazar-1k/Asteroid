@@ -3,7 +3,7 @@
 static const char path[] = "font/TerminatorCyr.ttf";
 
 Button::Button(SDL_Renderer* renderer, std::string text, SDL_Rect rect)
-    : m_renderer(renderer), m_text(text), m_rect(rect), m_textColor({ 0, 0, 0, 255 })
+    : m_renderer(renderer), m_text(text), m_rect(rect), m_textColor({ 0, 0, 0, 255 }), m_hoveredRectColor({0,0,0,0}), m_isPressed(false), m_rectColor({ 0,0,0,0 })
 {
     // Initialize SDL_ttf
     if (TTF_Init() == -1)

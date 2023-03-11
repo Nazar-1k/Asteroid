@@ -2,7 +2,6 @@
 
 InputBox::InputBox(SDL_Renderer* renderer, int x, int y, int w, int h, std::string font_path, int font_size, SDL_Color font_color, SDL_Color background_color)
 {
-
     // Initialize member variables
     m_renderer = renderer;
     m_rect = { x, y, w, h };

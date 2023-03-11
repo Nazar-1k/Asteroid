@@ -3,7 +3,7 @@
 static const char path[] = "font/TerminatorCyr.ttf";
 
 Text::Text(int x, int y, SDL_Renderer* renderer, std::string text, int size, SDL_Color textColor)
-    :m_x(x), m_y(y), m_renderer(renderer), m_text(text), m_textColor(textColor)
+    :m_x(x), m_y(y), m_renderer(renderer), m_text(text), m_textColor(textColor), m_rect({ 0,0,0,0 })
 {
     // Initialize SDL_ttf
     if (TTF_Init() == -1)
@@ -25,9 +25,6 @@ Text::Text(int x, int y, SDL_Renderer* renderer, std::string text, int size, SDL
 Text::~Text()
 {
     TTF_CloseFont(m_font);
-   /* delete textSurface;
-    delete textTexture;*/
-
 }
 
 void Text::draw() 

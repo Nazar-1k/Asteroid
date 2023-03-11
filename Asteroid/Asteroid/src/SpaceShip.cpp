@@ -100,8 +100,8 @@ void Ship::move()
       /*  dy -= velocity;*/
     if (keyDown == true)
     {
-        dy = 0;
-        dx = 0;
+      /*  dy = 0;
+        dx = 0;*/
     }
     if (keyRight == true)
     {
@@ -142,11 +142,6 @@ void  Ship::starSet(int s_width, int s_heigth)
     x = static_cast<float>(s_width / 2);
     y = static_cast<float>(s_heigth / 2);
 
-    if (dead == true)
-    {
-        count_life = 3;
-        dead = false;
-    }
     setAlpha(255);
 }
 

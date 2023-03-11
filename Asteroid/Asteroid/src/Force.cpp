@@ -9,7 +9,7 @@ static const char* pathAutoShot = "data/force/auto.png";
 static const char* pathHelpShot = "data/force/bullet.png";
 
 Force::Force(SDL_Renderer* renderer, float x, float y)
-	:isShow(true), isTake(false)
+	:isShow(true), isTake(false), delete_(false), renderer(nullptr)
 {
 	countForce = rand() % 4;
 	switch (countForce)
@@ -32,6 +32,14 @@ Force::Force(SDL_Renderer* renderer, float x, float y)
 
 	
 	rect = { static_cast<int>(x) - width / 2, static_cast<int>(y) - height / 2, getWidth(), getHeight() };
+}
+
+void Force::takeForce()
+{
+	x = -100;
+	y = -100;
+	isShow = false;
+	isTake = true;
 }
 
 bool Force::colideShip(Ship& ship)
@@ -57,7 +65,7 @@ void Force::render(int s_width, int s_height)
 	if (isTake)
 	{
 		setAlpha(100);
-		Sprite::render(s_width - width - 10, s_height - height - 10);
+		Sprite::render(static_cast<float>(s_width - width - 10), static_cast<float>(s_height - height - 10));
 	}
 }
 

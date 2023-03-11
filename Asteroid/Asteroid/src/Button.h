@@ -26,8 +26,8 @@ public:
 
     void setPosition(int x, int y);
 
-    int getWidth() { return m_rect.w; }
-    int getHeight() { return m_rect.h; }
+    int getWidth() const { return m_rect.w; }
+    int getHeight() const { return m_rect.h; }
 
     void setTextColor(SDL_Color textColor);
     void setText(std::string text);

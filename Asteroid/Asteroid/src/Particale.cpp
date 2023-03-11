@@ -13,7 +13,7 @@ static const char pathGrey[] = "data/Particles/grey.png";
 static const char pathShimmer[] = "data/Particles/shimmer.png";
 
 Particle::Particle(float x, float y, int side, float angle, SDL_Renderer* renderer)
-	:dead(false)
+	:dead(false),dx(0),dy(0),Texture(nullptr)
 {
 	if (!texture_is_load)
 	{
@@ -80,7 +80,7 @@ Particle::Particle(float x, float y, int side, float angle, SDL_Renderer* render
 }
 
 Particle::Particle(float x, float y,int side, SDL_Renderer* renderer)
-	:dead(false)
+	:dead(false),  dx(0), dy(0), Texture(nullptr)
 {
 	if (!texture_is_load)
 	{

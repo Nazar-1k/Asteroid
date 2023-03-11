@@ -57,6 +57,8 @@ private:
 	void renderBullets();
 	void updateBullets();
 
+	void updateForce();
+
 	void renderMainMenu();
 	void renderGameInterface();
 	void renderBestScore();
@@ -79,7 +81,6 @@ private:
 
 	bool quit;
 	SDL_Event e;
-	SDL_MouseMotionEvent mouse_e;
 
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -90,8 +91,10 @@ private:
 
 	#pragma region Sprites
 
-	std::unique_ptr<BG> bg;
 	std::unique_ptr<Ship> ship;
+	bool click = false;
+
+	std::unique_ptr<BG> bg;
 	std::unique_ptr<Arrow> arrow;
 	std::vector<std::unique_ptr<Asteroid>> Asteroids;
 
@@ -253,102 +256,27 @@ private:
 #pragma endregion
 
 	//force 
+	std::vector<std::unique_ptr<Force>> force;
 	bool isShield = true;
 
-	bool click = false;
 	bool force1;
 	bool force2;
 	bool force3;
 	bool force4;
 
-	void createShield(float centerX, float centerY, int radius) 
-	{
-		/*isShield = true;*/
-		SDL_Rect fillRect = { centerX - radius, centerY - radius, radius * 2, radius * 2 };
-		
-
-		// Вираховуємо координати точок на колі
-		int x = 0;
-		int y = radius;
-		int d = 3 - 2 * radius;
-
-		// Рисуємо коло
-		while (y >= x) {
-			// 8 точок симетричні відносно центра кола
-			SDL_RenderDrawPoint(renderer, centerX + x, centerY + y);
-			SDL_RenderDrawPoint(renderer, centerX + x, centerY - y);
-			SDL_RenderDrawPoint(renderer, centerX - x, centerY + y);
-			SDL_RenderDrawPoint(renderer, centerX - x, centerY - y);
-			SDL_RenderDrawPoint(renderer, centerX + y, centerY + x);
-			SDL_RenderDrawPoint(renderer, centerX + y, centerY - x);
-			SDL_RenderDrawPoint(renderer, centerX - y, centerY + x);
-			SDL_RenderDrawPoint(renderer, centerX - y, centerY - x);
-
-			// Оновлюємо значення d та координат точок
-			if (d < 0) {
-				d = d + 4 * x + 6;
-			}
-			else {
-				d = d + 4 * (x - y) + 10;
-				y--;
-			}
-			x++;
-		}
-	}
-
-	void destroyShield(std::vector<std::unique_ptr<Asteroid>>& asteroids)
-	{
-		setShild(false);
-		
-
-	
-		
-	}
-
-	void setShild(bool shield) { isShield = shield; }
-	
 	void aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
+	
+	void createShield(float centerX, float centerY, int radius);
 
-	void aimBullet(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids)
-	{
-		
-		double closestDistance = std::numeric_limits<double>::max();
-		SDL_Point closestAsteroidPos = { 0, 0 };
+	void setShild(bool shield);
+	
 
-		// перебираємо всі астероїди на екрані
-		for (const auto& asteroid : asteroids) {
-			SDL_Point asteroidPos = { asteroid->getX(), asteroid->getY() };
+	void aimBullet(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
 
-			// обчислюємо відстань між кулею та поточним астероїдом
-			double distance = std::sqrt(std::pow(asteroidPos.x - bullet.getX(), 2) +
-				std::pow(asteroidPos.y - bullet.getY(), 2));
-
-			// обираємо астероїд з найменшою відстанню до кулі
-			if (distance < closestDistance) {
-				closestDistance = distance;
-				closestAsteroidPos = asteroidPos;
-			}
-		}
-
-		// наводимо кулю на знайдений найближчий астероїд
-		if (closestAsteroidPos.x > 0 or   closestAsteroidPos.y > 0)
-		{
-
-			bullet.SeekTarget(closestAsteroidPos.x, closestAsteroidPos.y);
-		}
-		else
-		{
-			bullet.setColor(255, 255, 255);
-		} 
-
-		
-	}
-
-	void Score100() { score_points += 100; }
+	void Score100();
 
 	int countDestroyShip = 0;
 
-	std::vector<std::unique_ptr<Force>> force;
 
 
 };

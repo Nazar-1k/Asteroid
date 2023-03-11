@@ -6,7 +6,7 @@ static const char pathSmallAsteroid[] = "data/Asteroids/small_asteroid.png";
 
 Asteroid::Asteroid(int x , int y, float angle, int mass, SDL_Renderer* renderer)
     : to_be_deleted(false), mass(mass),
-    speedrotation(static_cast<float>((rand() % (999 - 100) + 100) / static_cast<float>(1000)))
+    speedrotation(static_cast<float>((rand() % (999 - 100) + 100) / static_cast<float>(1000))),dx(0), dy(0)
 {
     setRenderer(renderer);
     if (mass == 3)
@@ -21,8 +21,8 @@ Asteroid::Asteroid(int x , int y, float angle, int mass, SDL_Renderer* renderer)
 
     dx += static_cast<float>(sin(angle * 3.14159 / 180) * velocity);
     dy += static_cast<float>(-cos(angle * 3.14159 / 180) * velocity);
-    this->x = x;
-    this->y = y;
+    this->x = static_cast<float>(x);
+    this->y = static_cast<float>(y);
    
     radius = static_cast<float>(width / 2);
     
@@ -150,4 +150,52 @@ void Asteroid::reflectingAsteroids(Asteroid& asteroid1, Asteroid& asteroid2)
     asteroid2.y = asteroid2.y - moveY / 2;
 }
 
+SDL_Point Asteroid::getPosition() const
+{
+    return { (int)x,(int)y };
+}
 
+
+void Asteroid::reflectingShildAsteroids(Ship& ship, Asteroid& asteroid1)
+{
+    // Calculate the angle of collision
+    float angle = atan2(asteroid1.getY() - ship.getY(), asteroid1.getX() - ship.getX());
+
+    // Calculate the new velocities after the collision
+    float velocity1 = std::sqrt(asteroid1.dx * asteroid1.dx + asteroid1.dy * asteroid1.dy);
+    float velocity2 = std::sqrt(ship.getDx() * ship.getDx() + ship.getDy() * ship.getDy());
+
+    float direction1 = atan2(asteroid1.dy, asteroid1.dx);
+    float direction2 = atan2(ship.getDy(), ship.getDx());
+
+    // Calculate the new velocities after the collision, taking into account the masses of the asteroids
+    float newVelocity1 = (velocity1 * (asteroid1.mass - 4) + 2 * 4 * velocity2) / (asteroid1.mass + 4);
+    float newVelocity2 = (velocity2 * (4 - asteroid1.mass) + 2 * asteroid1.mass * velocity1) / (asteroid1.mass + 4);
+
+    float newDirection1 = direction1 - angle;
+    float newDirection2 = direction2 - angle;
+
+    asteroid1.dx = static_cast<float>(newVelocity1 * cos(newDirection1) + velocity1 * sin(direction1 - angle) * cos(angle + M_PI / 2));
+    asteroid1.dy = static_cast<float>(newVelocity1 * sin(newDirection1) + velocity1 * sin(direction1 - angle) * sin(angle + M_PI / 2));
+
+    float fx = asteroid1.x - ship.getX();
+    float fy = asteroid1.y - ship.getY();
+
+    float distance = std::sqrt(fx * fx + fy * fy);
+
+    // Move the asteroids away from each other to avoid multiple collisions
+    float overlap = asteroid1.radius + ship.getWidth() / 2 + 18 - distance;
+    float moveX = overlap * cos(angle);
+    float moveY = overlap * sin(angle);
+
+    asteroid1.x = asteroid1.x + moveX / 2;
+    asteroid1.y = asteroid1.y + moveY / 2;
+}
+
+bool Asteroid::checkColitionShiled(float x, float y, float radius, Asteroid& asteroid1)
+{
+    float fx = asteroid1.x - x;
+    float fy = asteroid1.y - y;
+
+    return  std::sqrt(fx * fx + fy * fy) <= asteroid1.radius + radius;
+}

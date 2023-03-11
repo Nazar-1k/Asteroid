@@ -2,8 +2,18 @@
 
 Game::Game()
 	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
-	window(nullptr), renderer(nullptr), bg(nullptr),
-	 menu(true), game(false), stop_menu(false), setings(false), info(false),  score_points(0), gameover(false), stop(false)
+	window(nullptr), renderer(nullptr), icon(nullptr), e(),
+	bg(nullptr),
+	score_points(0),
+	menu(true), game(false),
+	setings(false), closeSet(false),
+	info(false),
+	stop_menu(false), back_stopMenu(false),continue_stopMenu(false), restart_stopMenu(false),
+	stop(false),
+	gameover(false), back_GameOver(false), restart_GameOver(false),
+	bestsRecord(false), closeRecord(false),
+	isShield(false),force1(false), force2(false), force3(false), force4(false),
+	BestRecordMenu({0,0,0,0}), SetMenuBG({0,0,0,0}), bgStopMenu({0,0,0,0})
 {
 	
 }
@@ -41,63 +51,15 @@ void Game::update()
 			
 			
 			initAsteroid(6);
-			moveAsteroid();
+			if (ship->getX() != SCREEN_WIDTH / 2 or ship->getY() != SCREEN_HEIGHT / 2)
+				moveAsteroid();
 			
 			
 			
 			updateBullets();
 			
 
-			for (auto& forcee : force)
-			{
-				if (forcee->colideShip(*ship))
-				{
-					std::cout << "ship";
-					forcee->takeForce();
-					forcee->startTimer();
-				}
-			}
-
-
-
-			for (auto& forcee : force)
-			{
-				forcee->ActiveForce(force1, force2, force3, force4);
-			}
-			/*std::cout << force1 << " " << force2 << " " << force3 << " " << force4 << std::endl;*/
-
-			if (force1)
-			{
-				setShild(force1);
-				force1 = false;
-			}
-			else
-				setShild(force1);
-
-			
-			if (force2)
-				for (auto& bull : bullets)
-				{
-					aimBulletInDirection(*bull, Asteroids);
-				}
-			
-			if (force3)
-			{
-				if (bullets.size() == 0)
-				{
-					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow }));
-
-				}
-
-				for (auto& bull : bullets)
-					aimBullet(*bull, Asteroids);
-			}
-
-
-			if (force4)
-				Score100();
-			
-			
+			updateForce();
 			
 		}
 		
@@ -135,7 +97,7 @@ void Game::render()
 		if(isShield)
 			for (auto& asteroid : Asteroids)
 			{
-				if(Asteroid::checkColitionShiled(ship->getX(), ship->getY(), ship->getWidth()/2 + 18, *asteroid) )
+				if(Asteroid::checkColitionShiled(static_cast<float>(ship->getX()), static_cast<float>(ship->getY()), static_cast<float>(ship->getWidth()/2 + 18), *asteroid) )
 					Asteroid::reflectingShildAsteroids(*ship, *asteroid);
 
 			
@@ -150,7 +112,7 @@ void Game::render()
 		renderGameInterface();
 	}
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
-	if(isShield)
+	if(isShield and !stop_menu)
 		createShield(ship->getX(), ship->getY(), ship->getHeight() / 2 + 18);
 
 	SDL_RenderPresent(renderer);
@@ -170,11 +132,6 @@ void Game::pollEventWindow()
 			
 			if (e.button.button == SDL_BUTTON_LEFT and game) 
 			{
-				if(!isShield)
-				isShield = true;
-				else if (isShield)
-					isShield = false;
-
 				if(!stop_menu)
 					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
 			}	
@@ -856,14 +813,16 @@ void  Game::renderAsteroid()
 
 void Game::moveAsteroid()
 {
-	if (destroyShip_particle.size() <= 5 and ship->isDead())
+	/*if (destroyShip_particle.size() <= 5 and ship->isDead())
 	{
 		destroyShip();
-	}
+	}*/
 
 	//BIG Asteroid
+	int i = 0;
 	for (auto& asteroid : Asteroids)
 	{
+		i++;
 		if(!stop)
 		asteroid->move();
 
@@ -888,11 +847,11 @@ void Game::moveAsteroid()
 						Asteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 180, 3, renderer }));
 					}
 					countDestroyShip++;
-					if (countDestroyShip % 11 == 0 and force.empty() )
+  					if (countDestroyShip % 11 == 0 and force.empty() )
 					{
 						force.push_back(std::unique_ptr<Force>(new Force{ renderer,asteroid->getX(), asteroid->getY() }));
 					}
-
+				/*	Asteroids.erase(Asteroids.begin() + i);*/
 					asteroid->deleteAsteroid();
 					score_points += 10;
 				}
@@ -916,8 +875,8 @@ void Game::aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_pt
 {
 	double closestDistance = std::numeric_limits<double>::max();
 	SDL_Point closestAsteroidPos = { -1, -1 };
-	SDL_Point bulletPos = { bullet.getX(), bullet.getY() };
-	SDL_Point bulletDir = { bullet.getDx(), bullet.getDy() };
+	SDL_Point bulletPos = { static_cast<int>(bullet.getX()), static_cast<int>(bullet.getY()) };
+	SDL_Point bulletDir = { static_cast<int>(bullet.getDx()), static_cast<int>(bullet.getDy()) };
 	// перебираємо всі астероїди на екрані
 	for (const auto& asteroid : asteroids) {
 		SDL_Point asteroidPos = asteroid->getPosition();
@@ -944,6 +903,86 @@ void Game::aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_pt
 		bullet.setColor(255, 255, 255);
 	}
 
+}
+
+void Game::createShield(float centerX, float centerY, int radius)
+{
+	/*isShield = true;*/
+	SDL_Rect fillRect = { static_cast<int>(centerX - radius), static_cast<int>(centerY - radius), radius * 2, radius * 2 };
+
+
+	// Вираховуємо координати точок на колі
+	int x = 0;
+	int y = radius;
+	int d = 3 - 2 * radius;
+
+	// Рисуємо коло
+	while (y >= x) {
+		// 8 точок симетричні відносно центра кола
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX + x), static_cast<int>(centerY + y));
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX + x), static_cast<int>(centerY - y));
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX - x), static_cast<int>(centerY + y));
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX - x), static_cast<int>(centerY - y));
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX + y), static_cast<int>(centerY + x));
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX + y), static_cast<int>(centerY - x));
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX - y), static_cast<int>(centerY + x));
+		SDL_RenderDrawPoint(renderer, static_cast<int>(centerX - y), static_cast<int>(centerY - x));
+
+		// Оновлюємо значення d та координат точок
+		if (d < 0) {
+			d = d + 4 * x + 6;
+		}
+		else {
+			d = d + 4 * (x - y) + 10;
+			y--;
+		}
+		x++;
+	}
+}
+
+void Game::setShild(bool shield)
+{
+	isShield = shield;
+}
+
+void Game::aimBullet(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids)
+{
+
+	double closestDistance = std::numeric_limits<double>::max();
+	SDL_Point closestAsteroidPos = { 0, 0 };
+
+	// перебираємо всі астероїди на екрані
+	for (const auto& asteroid : asteroids) {
+		SDL_Point asteroidPos = { static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()) };
+
+		// обчислюємо відстань між кулею та поточним астероїдом
+		double distance = std::sqrt(std::pow(asteroidPos.x - bullet.getX(), 2) +
+			std::pow(asteroidPos.y - bullet.getY(), 2));
+
+		// обираємо астероїд з найменшою відстанню до кулі
+		if (distance < closestDistance) {
+			closestDistance = distance;
+			closestAsteroidPos = asteroidPos;
+		}
+	}
+
+	// наводимо кулю на знайдений найближчий астероїд
+	if (closestAsteroidPos.x > 0 or closestAsteroidPos.y > 0)
+	{
+
+		bullet.SeekTarget(closestAsteroidPos.x, closestAsteroidPos.y);
+	}
+	else
+	{
+		bullet.setColor(255, 255, 255);
+	}
+
+
+}
+
+void Game::Score100()
+{ 
+	score_points += 100;
 }
 
 void Game::destroyShip()
@@ -978,6 +1017,10 @@ void Game::destroyShip()
 			
 				ship->takeLife();
 				stop = false;
+				force1 = false;
+				force2 = false;
+				force3 = false;
+				force4 = false;
 			}
 			else
 			{
@@ -1019,7 +1062,7 @@ void Game::renderBullets()
 
 	for (size_t i = 0; i < force.size(); i++)
 	{
-		if (!force[i]->delete_)
+		if (!force[i]->isDelete())
 			force[i]->render(SCREEN_WIDTH, SCREEN_HEIGHT);
 		else
 			force.erase(force.begin() + i);
@@ -1043,6 +1086,53 @@ void Game::updateBullets()
 		if(!stop )
 		bullet->move(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
+}
+
+void Game::updateForce()
+{
+
+	for (auto& forcee : force)
+	{
+		if (forcee->colideShip(*ship))
+		{
+			forcee->takeForce();
+			forcee->startTimer();
+		}
+
+		forcee->ActiveForce(force1, force2, force3, force4);
+	}
+
+	if (force1)
+	{
+		setShild(force1);
+		force1 = false;
+	}
+	else
+		setShild(force1);
+
+
+	if (force2)
+		for (auto& bull : bullets)
+		{
+			aimBulletInDirection(*bull, Asteroids);
+		}
+
+	if (force3)
+	{
+		if (bullets.size() == 0)
+		{
+			bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow }));
+
+		}
+
+		for (auto& bull : bullets)
+			aimBullet(*bull, Asteroids);
+	}
+
+
+	if (force4)
+		Score100();
+
 }
 
 void Game::renderMainMenu()

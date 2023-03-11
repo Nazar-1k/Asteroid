@@ -60,7 +60,7 @@ void Bullet::creatBullet(Ship& Ship)
 {
     x = Ship.x;
     y = Ship.y;
-    angle = Ship.angle * 3.14159 / 180;
+    angle = static_cast<float>(Ship.angle * 3.14159 / 180);
 
     dx = static_cast<float>(sin(angle ) * bulletSpeed );
     dy = static_cast<float>(-cos(angle ) * bulletSpeed );
@@ -73,10 +73,8 @@ void Bullet::move(int w_screen, int h_screen)
 {
     if (is_bullet_active)
     {
-        x += bulletSpeed * cos(angle * M_PI / 180);
-        y += bulletSpeed * sin(angle * M_PI / 180);
-        /*x += dx;
-        y += dy;*/
+        x += static_cast<float>(bulletSpeed * cos(angle * M_PI / 180));
+        y += static_cast<float>(bulletSpeed * sin(angle * M_PI / 180));
 
         if (x < 0 || x > w_screen)
             is_bullet_active = false;
@@ -92,4 +90,18 @@ bool Bullet::colideAsteroid(Asteroid& ast)
     float fy = ast.y - y;
 
     return  std::sqrt(fx * fx + fy * fy) <= ast.radius + height / 20;
+}
+
+void Bullet::SeekTarget(int target_x, int target_y)
+{
+    dx = target_x - x;
+    dy = target_y - y;
+    angle = static_cast<float>(atan2(dy, dx) * 180 / M_PI);
+    setColor(255, 0, 0);
+}
+
+void Bullet::setVelocity(float dx, float dy)
+{
+    this->dx = dx;
+    this->dy = dy;
 }

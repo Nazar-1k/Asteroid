@@ -5,7 +5,8 @@
 
 #include <string>
 
-class InputBox {
+class InputBox 
+{
 public:
     InputBox(SDL_Renderer* renderer, int x, int y, int w, int h, std::string font_path, int font_size, SDL_Color font_color, SDL_Color background_color); 
 
