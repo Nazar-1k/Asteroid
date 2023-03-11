@@ -1,9 +1,10 @@
 #include "Force.h"
+#include "Game.h"
 
 
 
 static const char* pathShield = "data/force/bron.png";
-static const char* pathScore = "data/force/score.png";
+static const char* pathScore = "data/force/star.png";
 static const char* pathAutoShot = "data/force/auto.png";
 static const char* pathHelpShot = "data/force/bullet.png";
 
@@ -17,29 +18,33 @@ Force::Force(SDL_Renderer* renderer, float x, float y)
 		initSprite(pathShield, renderer);
 		break;
 	case 1:
-		initSprite(pathScore, renderer);
+		initSprite(pathHelpShot, renderer);
 		break;
 	case 2:
 		initSprite(pathAutoShot, renderer);
 		break;
 	case 3:
-		initSprite(pathHelpShot, renderer);
+		initSprite(pathScore, renderer);
 		break;
 	}
 	this->x = x;
 	this->y = y;
 
-	rect = { static_cast<int>(x), static_cast<int>(y) , getWidth(), getHeight() };
+	
+	rect = { static_cast<int>(x) - width / 2, static_cast<int>(y) - height / 2, getWidth(), getHeight() };
 }
 
 bool Force::colideShip(Ship& ship)
 {
 	float fx = ship.getX() - x;
 	float fy = ship.getY() - y;
-	isShow = false;
-	isTake = true;
-	timer.start();
+	
 	return  std::sqrt(fx * fx + fy * fy) <= ship.getWidth() + width / 2;
+}
+
+void Force::startTimer()
+{
+	timer.start();
 }
 
 void Force::render(int s_width, int s_height)
@@ -51,38 +56,52 @@ void Force::render(int s_width, int s_height)
 
 	if (isTake)
 	{
-		SDL_Rect renderQuad = { static_cast<int>(s_width - width - 10),  static_cast<int>(s_height - height - 10), width, height };
-		SDL_Rect* clip{};
-
-		//Set clip rendering dimensions
-		if (clip != NULL)
-		{
-			renderQuad.w = clip->w;
-			renderQuad.h = clip->h;
-		}
-		//Render to screen
-		SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, flip);
+		setAlpha(100);
+		Sprite::render(s_width - width - 10, s_height - height - 10);
 	}
 }
 
-void Force::ActiveForce(std::function<void()> func1, std::function<void()> func2, std::function<void()> func3, std::function<void()> func4)
+void Force::ActiveForce(bool& force1, bool& force2, bool& force3, bool& force4)
 {
-	if (timer.getTicks() - timer.isStarted() <= 10'000)
+
+	
+	if (isTake)
 	{
+		/*std::cout << timer.getTicks() << std::endl;*/
+	
+	if (timer.getTicks() <= 10'000 and !timer.isPaused())
+	{
+		/*std::cout << timer.getTicks() - timer.isStarted() << std::endl;*/
 		switch (countForce)
 		{
 		case 0:
-			func1();
+			force1 = true;
 			break;
 		case 1:
-			func2();
+			force2 = true;
 			break;
 		case 2:
-			func3();
+			force3 = true;
 			break;
 		case 3:
-			func4();
+			force4 = true;
+			timer.pause();
 			break;
 		}
+	}
+	else
+	{ 
+		
+		force1 = false;
+		force2 = false;
+		force3 = false;
+		force4 = false;
+
+		delete_ = true;
+		
+		timer.pause();
+		isShow = true;
+		isTake = false;
+	}
 	}
 }

@@ -253,9 +253,17 @@ private:
 #pragma endregion
 
 	//force 
-	bool isShield = false;
-	void createShield(float centerX, float centerY, int radius) {
-		isShield = true;
+	bool isShield = true;
+
+	bool click = false;
+	bool force1;
+	bool force2;
+	bool force3;
+	bool force4;
+
+	void createShield(float centerX, float centerY, int radius) 
+	{
+		/*isShield = true;*/
 		SDL_Rect fillRect = { centerX - radius, centerY - radius, radius * 2, radius * 2 };
 		
 
@@ -287,6 +295,17 @@ private:
 			x++;
 		}
 	}
+
+	void destroyShield(std::vector<std::unique_ptr<Asteroid>>& asteroids)
+	{
+		setShild(false);
+		
+
+	
+		
+	}
+
+	void setShild(bool shield) { isShield = shield; }
 	
 	void aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
 
@@ -326,6 +345,10 @@ private:
 	}
 
 	void Score100() { score_points += 100; }
+
+	int countDestroyShip = 0;
+
+	std::vector<std::unique_ptr<Force>> force;
 
 
 };

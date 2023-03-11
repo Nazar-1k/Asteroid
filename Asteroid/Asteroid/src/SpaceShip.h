@@ -27,8 +27,11 @@ public:
 	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
 	friend void Bullet::creatBullet(Ship& Ship);
 
-	
+	float getDx() { return dx; }
+	float getDy() { return dy; }
 
+
+	float getVelocity() { return velocity;  }
 	int getLife() const { return count_life; }
 	void setLife(int life);
 	void takeLife();

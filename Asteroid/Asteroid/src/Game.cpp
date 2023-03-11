@@ -40,26 +40,63 @@ void Game::update()
 			ship->move();
 			
 			
-			initAsteroid(20);///
+			initAsteroid(6);
 			moveAsteroid();
 			
-			/*Asteroids[1]->setX(0);
-			Asteroids[1]->setY(0);*/
+			
 			
 			updateBullets();
 			
-				
-				if (bullets.size() ==0)
-				{
-				bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow }));
 
+			for (auto& forcee : force)
+			{
+				if (forcee->colideShip(*ship))
+				{
+					std::cout << "ship";
+					forcee->takeForce();
+					forcee->startTimer();
 				}
+			}
+
+
+
+			for (auto& forcee : force)
+			{
+				forcee->ActiveForce(force1, force2, force3, force4);
+			}
+			/*std::cout << force1 << " " << force2 << " " << force3 << " " << force4 << std::endl;*/
+
+			if (force1)
+			{
+				setShild(force1);
+				force1 = false;
+			}
+			else
+				setShild(force1);
+
+			
+			if (force2)
 				for (auto& bull : bullets)
 				{
-					aimBullet(*bull, Asteroids);
+					aimBulletInDirection(*bull, Asteroids);
 				}
-				/*bullets[0]->SeekTarget(Asteroids[0]->getX(), Asteroids[0]->getY());*/
-				
+			
+			if (force3)
+			{
+				if (bullets.size() == 0)
+				{
+					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow }));
+
+				}
+
+				for (auto& bull : bullets)
+					aimBullet(*bull, Asteroids);
+			}
+
+
+			if (force4)
+				Score100();
+			
 			
 			
 		}
@@ -95,6 +132,15 @@ void Game::render()
 	}
 	else if (game)
 	{
+		if(isShield)
+			for (auto& asteroid : Asteroids)
+			{
+				if(Asteroid::checkColitionShiled(ship->getX(), ship->getY(), ship->getWidth()/2 + 18, *asteroid) )
+					Asteroid::reflectingShildAsteroids(*ship, *asteroid);
+
+			
+			}
+
 		renderAsteroid();
 
 		renderBullets();
@@ -104,8 +150,8 @@ void Game::render()
 		renderGameInterface();
 	}
 	arrow->render(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	/*createShield(ship->getX(), ship->getY(), ship->getHeight() / 2 + 8);*/
+	if(isShield)
+		createShield(ship->getX(), ship->getY(), ship->getHeight() / 2 + 18);
 
 	SDL_RenderPresent(renderer);
 }
@@ -124,16 +170,34 @@ void Game::pollEventWindow()
 			
 			if (e.button.button == SDL_BUTTON_LEFT and game) 
 			{
+				if(!isShield)
+				isShield = true;
+				else if (isShield)
+					isShield = false;
+
 				if(!stop_menu)
 					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
 			}	
 
 		}
+		
 		if (e.type == SDL_KEYDOWN) 
 			if(e.key.keysym.sym == SDLK_SPACE)
 			{
+				if (!click)
+				{
+					if (!stop_menu)
 					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship }));
+				}
+				click = true;
 			}
+		if (e.type == SDL_KEYUP)
+		{
+			if (e.key.keysym.sym == SDLK_SPACE)
+			{
+				click = false;
+			}
+		}
 
 		pLay_button->handleEvent(e, arrow->getX(), arrow->getY());
 		quit_button->handleEvent(e, arrow->getX(), arrow->getY());
@@ -194,7 +258,7 @@ void Game::pollEventWindow()
 						bestsRecord = false;
 						info = false;
 					}
-					else if (score_button->isPressed())
+					else if (score_button->isPressed())	
 					{
 						SetBestRecord();
 						if(!bestsRecord)
@@ -206,12 +270,7 @@ void Game::pollEventWindow()
 					}
 					else if (info_button->isPressed())
 					{
-						if (!info)
-							info = true;
-						else if (info)
-							info = false;
-						bestsRecord = false;
-						setings = false;
+						system("start https://github.com/Nazar-1k/Asteroid_1979");
 					}
 
 					//close bestRecord
@@ -556,6 +615,8 @@ bool Game::initButton()
 
 void Game::initAsteroid(int count)
 {
+	
+
 	if ((Asteroids.size() < count))
 	{
 		int randScreenSide = rand() % 2;
@@ -795,6 +856,11 @@ void  Game::renderAsteroid()
 
 void Game::moveAsteroid()
 {
+	if (destroyShip_particle.size() <= 5 and ship->isDead())
+	{
+		destroyShip();
+	}
+
 	//BIG Asteroid
 	for (auto& asteroid : Asteroids)
 	{
@@ -821,6 +887,12 @@ void Game::moveAsteroid()
 						Asteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 90, 3, renderer }));
 						Asteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 180, 3, renderer }));
 					}
+					countDestroyShip++;
+					if (countDestroyShip % 11 == 0 and force.empty() )
+					{
+						force.push_back(std::unique_ptr<Force>(new Force{ renderer,asteroid->getX(), asteroid->getY() }));
+					}
+
 					asteroid->deleteAsteroid();
 					score_points += 10;
 				}
@@ -877,7 +949,7 @@ void Game::aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_pt
 void Game::destroyShip()
 {
 	
-	if (destroyShip_particle.size() <= 5 and !stop)
+	if (destroyShip_particle.size() <= 5 and !stop and !isShield)
 		destroyShip_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ ship->getX(), ship->getY() , ship->getWidth() / 15 ,10000, renderer }));
 	
 	if (ship->getLife() > 0)
@@ -891,26 +963,29 @@ void Game::destroyShip()
 			
 			stop_menu = true;
 			gameover = true;
-
+			stop = true;
 		}
 	}
 	
 	if (!gameover)
 	{
-		if (destroyShip_particle.empty())
+		if (!isShield)
 		{
-			ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
-			deleteObject();
+			if (destroyShip_particle.empty())
+			{
+				ship->starSet(SCREEN_WIDTH, SCREEN_HEIGHT);
+				deleteObject();
 			
-			ship->takeLife();
-			stop = false;
+				ship->takeLife();
+				stop = false;
+			}
+			else
+			{
+				ship->setDead(true);
+				ship->setAlpha(0);
+				stop = true;
+			}
 		}
-		else
-		{
-			ship->setAlpha(0);
-			stop = true;
-		}
-
 	}
 
 }
@@ -942,6 +1017,15 @@ void Game::renderBullets()
 		}
 	}
 
+	for (size_t i = 0; i < force.size(); i++)
+	{
+		if (!force[i]->delete_)
+			force[i]->render(SCREEN_WIDTH, SCREEN_HEIGHT);
+		else
+			force.erase(force.begin() + i);
+		
+	}
+
 	if (!stop)
 	for (size_t i = 0; i < bullets.size(); i++)
 	{
@@ -956,7 +1040,7 @@ void Game::updateBullets()
 {
 	for (auto& bullet : bullets)
 	{
-		if(!stop)
+		if(!stop )
 		bullet->move(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 }
@@ -1088,6 +1172,7 @@ void Game::deleteObject()
 {
 	Asteroids.clear();
 	bullets.clear();
+	force.clear();
 	stop = false;
 }
 
