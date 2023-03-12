@@ -1,6 +1,6 @@
 #include "TextBox.h"
 
-InputBox::InputBox(SDL_Renderer* renderer, int x, int y, int w, int h, std::string font_path, int font_size, SDL_Color font_color, SDL_Color background_color)
+InputBox::InputBox(SDL_Renderer* renderer, int x, int y, int w, int h, std::string font_path, int font_size, SDL_Color font_color, SDL_Color background_color, std::string& name)
 {
     // Initialize member variables
     m_renderer = renderer;
@@ -16,12 +16,22 @@ InputBox::InputBox(SDL_Renderer* renderer, int x, int y, int w, int h, std::stri
         // Handle font load failure
         SDL_Log("Failed to load font: %s", TTF_GetError());
     }
+  
     // Initialize surface and texture
     m_surface = SDL_CreateRGBSurface(0, m_rect.w, m_rect.h, 32, 0, 0, 0, 0);
     m_texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
 
     // Set initial text
-    setText(" ");
+   setText(" "); 
+   
+   if (setName(".info/Name.txt").empty())
+   {
+       setText(" ");
+   }
+   else
+       setName(".info/Name.txt");
+   name = m_text;
+    
 }
 
 InputBox::~InputBox() {
@@ -31,7 +41,7 @@ InputBox::~InputBox() {
     SDL_DestroyTexture(m_texture);
 }
 
-void InputBox::handleEvent(SDL_Event& event)
+void InputBox::handleEvent(SDL_Event& event, std::string& name)
 {
     // Handle input events
     if (active && event.type == SDL_TEXTINPUT)
@@ -41,7 +51,7 @@ void InputBox::handleEvent(SDL_Event& event)
         {
             m_text += event.text.text;
             setText(m_text);
-
+            name = m_text;
         }
     }
     else if (active && event.type == SDL_KEYDOWN)
@@ -50,7 +60,7 @@ void InputBox::handleEvent(SDL_Event& event)
             // Remove last character from text
             m_text.pop_back();
             setText(m_text);
-
+            name = m_text;
         }
     }
     else if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -60,6 +70,7 @@ void InputBox::handleEvent(SDL_Event& event)
             mouseY >= m_rect.y && mouseY <= m_rect.y + m_rect.h)
         {
             active = true;
+           
         }
         else
         {
@@ -88,11 +99,41 @@ void InputBox::setText(std::string text)
     m_texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
 }
 
-void InputBox::render() {
+void InputBox::writeLineToFile(std::string filename, std::string line) {
+    std::ofstream file(filename);
+    if (file.is_open()) 
+    {
+        file << line;
+        file.close();
+    }
+}
+
+std::string InputBox::setName(std::string filename)
+{
+    std::ifstream file(filename);
+    std::string line;
+    if (file.is_open()) {
+        getline(file, line);
+        file.close();
+    }
+    m_text = line;
+    return line;
+}
+
+
+void InputBox::render(std::string name) {
     // Render texture onto renderer
+    if (!name.empty())
+    {
+        setText(name);
+       
+        writeLineToFile(".info/Name.txt", name);
+    }
+
     if (m_text.length() == 1 && !active)
     {
         setText(" Input Name");
+
     }
     if (active)
     {
@@ -103,12 +144,14 @@ void InputBox::render() {
         else
         {
             setText(m_text);
+          
+            writeLineToFile(".info/Name.txt", name);
         }
 
     }
     if (!active)
     {
-
+        
         setText(m_text);
     }
 

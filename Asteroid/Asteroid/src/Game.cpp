@@ -1,5 +1,7 @@
 #include "Game.h"
 
+static const char pathFire[] = "soundEffects/1.wav";
+
 Game::Game()
 	:SCREEN_WIDTH(1000), SCREEN_HEIGHT(600), quit(false),
 	window(nullptr), renderer(nullptr), icon(nullptr), e(),
@@ -9,13 +11,13 @@ Game::Game()
 	setings(false), closeSet(false),
 	info(false),
 	stop_menu(false), back_stopMenu(false),continue_stopMenu(false), restart_stopMenu(false),
-	stop(false),
+	stop(false), startRound(false),
 	gameover(false), back_GameOver(false), restart_GameOver(false),
 	bestsRecord(false), closeRecord(false),
 	isShield(false),force1(false), force2(false), force3(false), force4(false),
 	BestRecordMenu({0,0,0,0}), SetMenuBG({0,0,0,0}), bgStopMenu({0,0,0,0})
 {
-	
+
 }
 
 Game::~Game()
@@ -51,16 +53,43 @@ void Game::update()
 			
 			
 			initAsteroid(6);
-			if (ship->getX() != SCREEN_WIDTH / 2 or ship->getY() != SCREEN_HEIGHT / 2)
+			if (ship->getX() != SCREEN_WIDTH / 2 or ship->getY() != SCREEN_HEIGHT / 2 or !bullets.empty())
+			{
+				startRound = true;
+			}
+			if (startRound)
+			{
 				moveAsteroid();
-			
-			
-			
-			updateBullets();
-			
+				updateForce();
+				updateBullets();
 
-			updateForce();
+				if (Mix_PlayingMusic() == 0 or Musik_check->isChecked())
+				{
+					//Play the music
+					Mix_PlayMusic(gMusic, -1);
+				}
+				else if(Mix_PausedMusic() == 1 or Musik_check->isChecked())
+				{
+					Mix_HaltMusic();
+				}
 			
+				//If music is being played
+				//else
+				//{
+				//	//If the music is paused
+				//	if (Mix_PausedMusic() == 1)
+				//	{
+				//		//Resume the music
+				//		Mix_ResumeMusic();
+				//	}
+				//	//If the music is playing
+				//	else
+				//	{
+				//		//Pause the music
+				//		Mix_PauseMusic();
+				//	}
+				//}
+			}
 		}
 		
 	}
@@ -127,34 +156,41 @@ void Game::pollEventWindow()
 			quit = true;
 		ship->PoolEvent(e);
 		arrow->PoolEvent(e);
-		if (e.type == SDL_MOUSEBUTTONDOWN)
+		if (ShotMouse_check->isChecked())
 		{
-			
-			if (e.button.button == SDL_BUTTON_LEFT and game) 
+			if (e.type == SDL_MOUSEBUTTONDOWN)
 			{
-				if(!stop_menu)
-					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow}));
-			}	
 
-		}
-		
-		if (e.type == SDL_KEYDOWN) 
-			if(e.key.keysym.sym == SDLK_SPACE)
-			{
-				if (!click)
+				if (e.button.button == SDL_BUTTON_LEFT and game)
 				{
 					if (!stop_menu)
-					bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship }));
+						bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship, *arrow }));
 				}
-				click = true;
-			}
-		if (e.type == SDL_KEYUP)
-		{
-			if (e.key.keysym.sym == SDLK_SPACE)
-			{
-				click = false;
+
 			}
 		}
+	
+		else if (ShotSpace_check->isChecked())
+		{
+			if (e.type == SDL_KEYDOWN)
+				if (e.key.keysym.sym == SDLK_SPACE)
+				{
+					if (!click)
+					{
+						if (!stop_menu)
+							bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ renderer, *ship }));
+					}
+					click = true;
+				}
+			if (e.type == SDL_KEYUP)
+			{
+				if (e.key.keysym.sym == SDLK_SPACE)
+				{
+					click = false;
+				}
+			}
+		}
+		
 
 		pLay_button->handleEvent(e, arrow->getX(), arrow->getY());
 		quit_button->handleEvent(e, arrow->getX(), arrow->getY());
@@ -173,10 +209,20 @@ void Game::pollEventWindow()
 
 		close_button->handleEvent(e, arrow->getX(), arrow->getY());
 
-		Name_Ship->handleEvent(e);
+		Name_Ship->handleEvent(e, player1.name);
 
-		ShotMouse_check->handleEvent(e);
+		
 		ShotSpace_check->handleEvent(e);
+
+		if (ShotMouse_check->handleEvent(e) or ShotMouse_check->isChecked())
+		{
+			ShotSpace_check->setChecked(false);
+		}
+		if (ShotSpace_check->handleEvent(e) or ShotSpace_check->isChecked())
+		{
+			ShotMouse_check->setChecked(false);
+		}
+
 		Musik_check->handleEvent(e);
 		Efeckt_check->handleEvent(e);
 
@@ -384,6 +430,14 @@ bool Game::initWindow()
 		return  false;
 	}
 
+	gMusic = Mix_LoadMUS("soundEffects/musik.wav");
+	if (gMusic == NULL)
+	{
+		printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+		return false;
+	}
+
+
 	//Create renderer for window
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (!renderer)
@@ -481,9 +535,11 @@ bool Game::initButton()
 	SetMenuBG = { SCREEN_WIDTH / 6 ,  SCREEN_HEIGHT / 6,SCREEN_WIDTH - SCREEN_WIDTH / 3 ,SCREEN_HEIGHT - SCREEN_HEIGHT / 4 };
 
 	Set_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2, BestRecordMenu.y + 50, renderer, "Settings", 40, { 255, 255, 255, 255 } });
-	
+
 	Name_text = std::unique_ptr<Text>(new Text{ SetMenuBG.x + 70, BestRecordMenu.y + 110, renderer, "Name", 25, { 255, 255, 255, 255 } });
-	Name_Ship = std::unique_ptr<InputBox>(new InputBox{ renderer,  SetMenuBG.x + 140 , BestRecordMenu.y + 90 , 300, 50,"font/TerminatorCyr.ttf",  25, {255,255,255,255}, {55, 116, 224,255} });
+
+	Name_Ship = std::unique_ptr<InputBox>(new InputBox{ renderer,  SetMenuBG.x + 140 , BestRecordMenu.y + 90 , 300, 50,"font/TerminatorCyr.ttf",  25, {255,255,255,255}, {55, 116, 224,255}, player1.name });
+	
 	
 	Shot_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 - 150, BestRecordMenu.y + 180, renderer, "Shot", 25, { 255, 255, 255, 255 } });//
 
@@ -492,14 +548,17 @@ bool Game::initButton()
 
 	ShotSpace_text = std::unique_ptr<Text>(new Text{ SetMenuBG.x + 170, BestRecordMenu.y + 260, renderer, "Space", 20, { 255, 255, 255, 255 } });//
 	ShotSpace_check = std::unique_ptr<CheckBox>(new CheckBox{ renderer,  SetMenuBG.x + 70,BestRecordMenu.y + 250,25,25 });
+	ShotSpace_check->setChecked(true);
 
 	Sound_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 + 150,  BestRecordMenu.y + 180, renderer, "Sound", 25, { 255, 255, 255, 255 } });;//
 
 	Musik_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 + 110,BestRecordMenu.y + 220, renderer, "Musik", 20, { 255, 255, 255, 255 } });//
 	Musik_check = std::unique_ptr<CheckBox>(new CheckBox{ renderer, SCREEN_WIDTH / 2 + 20,BestRecordMenu.y + 210,25,25 });
+	Musik_check->setChecked(true);
 
 	Effect_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 + 130, BestRecordMenu.y + 260, renderer, "Effect", 20, { 255, 255, 255, 255 } });//
 	Efeckt_check = std::unique_ptr<CheckBox>(new CheckBox{ renderer, SCREEN_WIDTH / 2 + 20,BestRecordMenu.y + 250,25,25 });
+	Efeckt_check->setChecked(true);
 
 	ScreenSize_text = std::unique_ptr<Text>(new Text{ SCREEN_WIDTH / 2 , BestRecordMenu.y + 320, renderer, "Screen Size", 25, { 255, 255, 255, 255 } });//
 
@@ -813,16 +872,10 @@ void  Game::renderAsteroid()
 
 void Game::moveAsteroid()
 {
-	/*if (destroyShip_particle.size() <= 5 and ship->isDead())
-	{
-		destroyShip();
-	}*/
-
-	//BIG Asteroid
-	int i = 0;
+	//Asteroid
 	for (auto& asteroid : Asteroids)
 	{
-		i++;
+		
 		if(!stop)
 		asteroid->move();
 
@@ -831,30 +884,6 @@ void Game::moveAsteroid()
 			if (ship->colideAsteroid(*asteroid) and menu == false)
 			{
 				destroyShip();
-			}
-	#pragma endregion
-
-	#pragma region colideBigAsteroid__Bullet
-			for (auto& bullet : bullets)
-			{
-				if (bullet->colideAsteroid(*asteroid))
-				{
-					bullet->destroy();
-					destroy_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() / 10 , renderer }));
-					if (asteroid->getMass() == 4)
-					{
-						Asteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 90, 3, renderer }));
-						Asteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 180, 3, renderer }));
-					}
-					countDestroyShip++;
-  					if (countDestroyShip % 11 == 0 and force.empty() )
-					{
-						force.push_back(std::unique_ptr<Force>(new Force{ renderer,asteroid->getX(), asteroid->getY() }));
-					}
-				/*	Asteroids.erase(Asteroids.begin() + i);*/
-					asteroid->deleteAsteroid();
-					score_points += 10;
-				}
 			}
 	#pragma endregion
 
@@ -867,6 +896,32 @@ void Game::moveAsteroid()
 				}
 			}
 	#pragma endregion 
+
+	#pragma region colideBigAsteroid__Bullet
+			for (auto& bullet : bullets)
+			{
+
+				if(bullet.get() != nullptr)
+					if (bullet->colideAsteroid(*asteroid))
+					{
+						bullet->destroy();
+						destroy_particle.push_back(std::unique_ptr<DestroyParticles>(new DestroyParticles{ asteroid->getX(), asteroid->getY() , asteroid->getWidth() / 10 , renderer }));
+						if (asteroid->getMass() == 4)
+						{
+							Asteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 90, 3, renderer }));
+							Asteroids.push_back(std::unique_ptr<Asteroid>(new Asteroid{ static_cast<int>(asteroid->getX()), static_cast<int>(asteroid->getY()), 180, 3, renderer }));
+						}
+						countDestroyShip++;
+  						if (countDestroyShip % 11 == 0 and force.empty() )
+						{
+							force.push_back(std::unique_ptr<Force>(new Force{ renderer,asteroid->getX(), asteroid->getY() }));
+						}
+					
+						asteroid->deleteAsteroid();
+						score_points += 10;
+					}
+			}
+	#pragma endregion
 
 	}
 }
@@ -997,8 +1052,8 @@ void Game::destroyShip()
 		{
 			ship->takeLife();
 			ship->setAlpha(0);
-		
-			addRecord("SHIP", score_points);
+			player1.points = score_points;
+			addRecord(player1.name, player1.points);
 			
 			stop_menu = true;
 			gameover = true;
@@ -1021,6 +1076,7 @@ void Game::destroyShip()
 				force2 = false;
 				force3 = false;
 				force4 = false;
+				startRound = false;
 			}
 			else
 			{
@@ -1229,10 +1285,9 @@ void Game::renderSetings()
 	Set_text->draw();
 
 
-	Name_Ship->render();
+	Name_Ship->render(player1.name);
 	Name_text->draw();
 	
-
 	Shot_text->draw();
 
 	ShotMouse_text->draw();
@@ -1291,6 +1346,7 @@ void  Game::addRecord(std::string new_name, int new_points)
 
 	// Запис даних про гравців до файлу
 	write_players(".info/Best_points.txt", players);
+	
 }
 
 std::vector<Player>  Game::read_players(std::string filename) {

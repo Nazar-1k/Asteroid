@@ -8,7 +8,8 @@ bool CheckBox::isChecked() const {
     return m_isChecked;
 }
 
-void CheckBox::setChecked(bool isChecked) {
+void CheckBox::setChecked(bool isChecked)
+{
     m_isChecked = isChecked;
 }
 

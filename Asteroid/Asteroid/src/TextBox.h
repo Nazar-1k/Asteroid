@@ -3,23 +3,27 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#include <fstream>
 #include <string>
 
 class InputBox 
 {
 public:
-    InputBox(SDL_Renderer* renderer, int x, int y, int w, int h, std::string font_path, int font_size, SDL_Color font_color, SDL_Color background_color); 
+    InputBox(SDL_Renderer* renderer, int x, int y, int w, int h, std::string font_path, int font_size, SDL_Color font_color, SDL_Color background_color, std::string& name);
 
 
     ~InputBox();
 
-    void handleEvent(SDL_Event& event);
-    
+    void handleEvent(SDL_Event& event, std::string& name);
+
+    std::string setName(std::string filename);
+    void writeLineToFile(std::string filename, std::string line);
 
     void setText(std::string text);
+    std::string getText() { return m_text; }
     
 
-    void render();
+    void render(std::string name);
 
 private:
     SDL_Renderer* m_renderer;
@@ -34,5 +38,6 @@ private:
     SDL_Texture* m_texture;
 
     bool active = false;
+    bool write;
     int lenght = 10;
 };

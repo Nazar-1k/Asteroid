@@ -27,6 +27,7 @@ struct Player
 	int points;
 };
 
+
 class Game
 {
 public:
@@ -66,6 +67,7 @@ private:
 
 	void deleteObject();
 
+	bool startRound;
 
 
 	#pragma region Window
@@ -142,12 +144,15 @@ private:
 	bool closeRecord;
 
 	#pragma region recordMethods
+
+	Player player1;
+
 	std::vector<Player> players;
 	// Function for comparing players by number of points
 	static bool compare_players(Player& p1, Player& p2){ return p1.points > p2.points; }
 		
 
-	void addRecord(std::string new_name, int new_points);
+	void addRecord(std::string new_name = "SHIP", int new_points = 0);
 
 	std::vector<Player> read_players(std::string filename);
 
@@ -192,91 +197,87 @@ private:
 	std::unique_ptr<Button> Size1000x600_button;
 	std::unique_ptr<Button> SizeFullScreen_button;
 
-
-
-
-
-
-
-
-
-
-
 	std::unique_ptr<Button> closeSet_button;
 	bool closeSet;
 
 
 
 
+
+
 	#pragma endregion
 
 	#pragma endregion
 
-#pragma region GameInterface
+	#pragma region GameInterface
 
-	std::unique_ptr<Text> score_text;
-	int score_points;
-	std::unique_ptr<Button> stop_button;
+		std::unique_ptr<Text> score_text;
+		int score_points;
+		std::unique_ptr<Button> stop_button;
 
-	std::unique_ptr<Sprite> heart;
+		std::unique_ptr<Sprite> heart;
 	
-	bool stop_menu;
-	Timer stop_timer;
+		bool stop_menu;
+		Timer stop_timer;
 
 
-	#pragma region stopMenu
+		#pragma region stopMenu
 	
-	SDL_Rect bgStopMenu;
+		SDL_Rect bgStopMenu;
 
-	std::unique_ptr<Text> pause_text;
+		std::unique_ptr<Text> pause_text;
 
-	std::unique_ptr<Button> continue_button;
-	std::unique_ptr<Button> restart_button;
-	std::unique_ptr<Button> back_button;
+		std::unique_ptr<Button> continue_button;
+		std::unique_ptr<Button> restart_button;
+		std::unique_ptr<Button> back_button;
 
-	bool continue_stopMenu;
-	bool restart_stopMenu;
-	bool back_stopMenu;
+		bool continue_stopMenu;
+		bool restart_stopMenu;
+		bool back_stopMenu;
 
+		#pragma endregion
+
+		#pragma region GameOverMenu
+
+		bool gameover;
+		std::unique_ptr<Text> gameOver_text;
+
+		std::unique_ptr<Button> restart_button_;
+		std::unique_ptr<Button> back_button_;
+
+		bool restart_GameOver;
+		bool back_GameOver;
+
+		#pragma endregion
+	
 	#pragma endregion
 
-	#pragma region GameOverMenu
+	#pragma region Force
 
-	bool gameover;
-	std::unique_ptr<Text> gameOver_text;
+		std::vector<std::unique_ptr<Force>> force;
+		bool isShield = true;
 
-	std::unique_ptr<Button> restart_button_;
-	std::unique_ptr<Button> back_button_;
+		bool force1;
+		bool force2;
+		bool force3;
+		bool force4;
 
-	bool restart_GameOver;
-	bool back_GameOver;
+		void aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
+	
+		void createShield(float centerX, float centerY, int radius);
 
+		void setShild(bool shield);
+	
+
+		void aimBullet(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
+
+		void Score100();
+
+		int countDestroyShip = 0;
 	#pragma endregion
-	
-#pragma endregion
 
-	//force 
-	std::vector<std::unique_ptr<Force>> force;
-	bool isShield = true;
 
-	bool force1;
-	bool force2;
-	bool force3;
-	bool force4;
-
-	void aimBulletInDirection(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
-	
-	void createShield(float centerX, float centerY, int radius);
-
-	void setShild(bool shield);
-	
-
-	void aimBullet(Bullet& bullet, const std::vector<std::unique_ptr<Asteroid>>& asteroids);
-
-	void Score100();
-
-	int countDestroyShip = 0;
-
+	Mix_Music* gMusic = NULL;
 
 
 };
