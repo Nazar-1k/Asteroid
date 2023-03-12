@@ -1,22 +1,44 @@
 #pragma once
 
-#include "FireParticale.h"
+#include "Particale.h"
 #include <SDL_mixer.h>
+#include "Bullet.h"
+#include "Force.h"
+#include "DestroyParticles.h"
+#include <vector>
 
 class Asteroid;
+class Arrow;
+
+
 
 class Ship : public Sprite
 {
 public:
-	Ship(const char* path, SDL_Renderer* renderer);
+	Ship(SDL_Renderer* renderer, int s_width, int s_height);
 	~Ship();
-	void PoolEvent(SDL_Event& event);
-	void move();
+	void PoolEvent(SDL_Event& event, bool onEfect);
+	void move(bool onEfect);
 
-	void render(SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
-	
+	void starSet(int s_width, int s_heigth);
+	void render(int S_width, int S_height, SDL_Rect* clip = NULL, float angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	bool colideAsteroid(Asteroid& ast);
 
+	friend void Bullet::creatBullet(Ship& Ship, Arrow& arrow);
+	friend void Bullet::creatBullet(Ship& Ship);
+
+	float getDx() { return dx; }
+	float getDy() { return dy; }
+
+
+	float getVelocity() { return velocity;  }
+	int getLife() const { return count_life; }
+	void setLife(int life);
+	void takeLife();
+
+	bool isDead() const { return dead; }
+	void setDead(bool dead);
+	
 private:
 	bool keyUP = false;
 	bool keyDown = false;
@@ -28,6 +50,9 @@ private:
 
 	float dx, dy;
 
+	bool dead;
+	int count_life;
+
 	//Particle count
 	static const int TOTAL_PARTICLES = 20;
 	//The particles
@@ -35,5 +60,4 @@ private:
 
 	//Shows the particles
 	void renderParticles();
-	
 };

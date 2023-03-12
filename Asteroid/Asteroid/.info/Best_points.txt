@@ -1,0 +1,26 @@
+matviys 1200
+SHIP 790
+name 410
+matviys 300
+matviys 210
+matviys 200
+matviys 200
+matviys 120
+name 80
+matviys 50
+matviys 30
+Name6 6
+Name5 5
+Name4 4
+Name3 3
+Name2 2
+Name1 1
+NaME 0
+matviys 0
+matviys 0
+matviys 0
+matviys 0
+matviys 0
+matviys 0
+name 0
+ name 0

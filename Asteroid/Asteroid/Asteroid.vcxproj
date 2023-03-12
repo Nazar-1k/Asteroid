@@ -146,27 +146,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\CheckBox.cpp" />
     <ClCompile Include="src\Bullet.cpp" />
     <ClCompile Include="src\Arrow.cpp" />
     <ClCompile Include="src\Asteroid.cpp" />
-    <ClCompile Include="src\FireParticale.cpp" />
+    <ClCompile Include="src\Button.cpp" />
+    <ClCompile Include="src\DestroyParticles.cpp" />
+    <ClCompile Include="src\Force.cpp" />
+    <ClCompile Include="src\Particale.cpp" />
     <ClCompile Include="src\Background.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\SpaceShip.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="src\Text.cpp" />
+    <ClCompile Include="src\TextBox.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Force.h" />
+    <ClInclude Include="src\CheckBox.h" />
+    <ClInclude Include="src\Button.h" />
+    <ClInclude Include="src\DestroyParticles.h" />
     <ClInclude Include="src\Bullet.h" />
     <ClInclude Include="src\Asteroid.h" />
     <ClInclude Include="src\Arrow.h" />
-    <ClInclude Include="src\FireParticale.h" />
+    <ClInclude Include="src\Particale.h" />
     <ClInclude Include="src\SpaceShip.h" />
     <ClInclude Include="src\Background.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\Timer.h" />
+    <ClInclude Include="src\Text.h" />
+    <ClInclude Include="src\TextBox.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="font\lazy.ttf" />

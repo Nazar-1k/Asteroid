@@ -1,13 +1,20 @@
 #include "SpaceShip.h"
 #include "Asteroid.h"
 
+
 static Mix_Chunk* fireSound = nullptr;
 
-Ship::Ship(const char* path, SDL_Renderer* renderer)
-    : Sprite(path, renderer)
+//soundEffects
+static const char pathFire[] = "soundEffects/thrust.wav";
+
+//Sprites
+static const char pathMainShip[] = "data/Spaceship/spaceship.png";
+
+Ship::Ship(SDL_Renderer* renderer, int s_width, int s_height)
 {
-    x = 600;
-    y = 300;
+    initSprite(pathMainShip, renderer);
+    count_life = 3;
+    starSet(s_width, s_height);    
 
     //Initialize particles
     for (int i = 0; i < TOTAL_PARTICLES; ++i)
@@ -16,11 +23,13 @@ Ship::Ship(const char* path, SDL_Renderer* renderer)
     }
 
     //Load music
-    fireSound = Mix_LoadWAV("soundEffects/fire.wav");
+   
+    fireSound = Mix_LoadWAV(pathFire);
     if (fireSound == NULL)
     {
         printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
     }
+
 }
 
 Ship::~Ship()
@@ -31,71 +40,80 @@ Ship::~Ship()
         delete particles[i];
     }
 
-    Mix_FreeChunk(fireSound);
+    /*Mix_FreeChunk(fireSound)*/;
 
     fireSound = nullptr;
 }
 
-
-void Ship::PoolEvent(SDL_Event& e)
+void Ship::PoolEvent(SDL_Event& e, bool onEfect)
 {
-    //If a key was press
-    if (e.type == SDL_KEYDOWN)
+    switch (e.type)
     {
-        //Adjust the velocity
-        if (e.key.keysym.sym == SDLK_UP)
+    //If a key was press
+    case SDL_KEYDOWN:
+        switch (e.key.keysym.sym)
+        {
+        case SDLK_UP:
         {
             keyUP = true;
+            
         }
-        if (e.key.keysym.sym == SDLK_DOWN)
-        {
+            break;
+        case SDLK_DOWN:
             keyDown = true;
-        }
-        if (e.key.keysym.sym == SDLK_LEFT)
-        {
+            break;
+        case SDLK_LEFT:
             keyLeft = true;
-        }
-        if (e.key.keysym.sym == SDLK_RIGHT)
-        {
+            break;
+        case SDLK_RIGHT:
             keyRight = true;
+            break;
         }
-    }
+        break;
+
     //If a key was released
-    if (e.type == SDL_KEYUP)
-    {
-        if (e.key.keysym.sym == SDLK_UP)
+    case SDL_KEYUP:
         {
-            keyUP = false;
+            switch (e.key.keysym.sym)
+            {
+            case SDLK_UP:
+            {
+             
+                keyUP = false;
+            }
+                break;
+            case SDLK_DOWN:
+                keyDown = false;
+                break;
+            case SDLK_LEFT:
+                keyLeft = false;
+                break;
+            case SDLK_RIGHT:
+                keyRight = false;
+                break;
+            }
         }
-        if (e.key.keysym.sym == SDLK_DOWN)
-        {
-            keyDown = false;
-        }
-        if (e.key.keysym.sym == SDLK_LEFT)
-        {
-            keyLeft = false;
-        }
-        if (e.key.keysym.sym == SDLK_RIGHT)
-        {
-            keyRight = false;
-        }
+        break;
     }
 }
 
-void Ship::move()
+void Ship::move(bool onEfect)
 {
+   
     #pragma region moveShip
     if (keyUP == true)
     {
-        dx += sin(angle * 3.14159 / 180) * velocity / 10;
-        dy += -cos(angle * 3.14159 / 180) * velocity / 10;
-        Mix_PlayChannel(-1, fireSound, 0);
+        dx += static_cast<float>(sin(angle * 3.14159 / 180) * velocity / 10);
+        dy += static_cast<float>(-cos(angle * 3.14159 / 180) * velocity / 10);
+       /* Mix_PlayChannel(-1, fireSound, 0);*/
+        if (onEfect)
+            Mix_PlayChannel(-1, fireSound, 0);
     }
       /*  dy -= velocity;*/
     if (keyDown == true)
     {
-        dy = 0;
-        dx = 0;
+      /*  dy = 0;
+        dx = 0;*/
     }
     if (keyRight == true)
     {
@@ -125,43 +143,69 @@ void Ship::move()
 
     #pragma endregion
 
+
 }
 
-void Ship::render(SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
+void  Ship::starSet(int s_width, int s_heigth)
 {
-    angle = this->angle;
-    //Set rendering space and render to screen
-    SDL_Rect renderQuad = { static_cast<int>(x - width / 2),  static_cast<int>(y - height / 2), width, height };
+    dx = 0;
+    dy = 0;
+    angle = 0;
+    x = static_cast<float>(s_width / 2);
+    y = static_cast<float>(s_heigth / 2);
 
-    //Set clip rendering dimensions
-    if (clip != NULL)
-    {
-        renderQuad.w = clip->w;
-        renderQuad.h = clip->h;
-    }
-    
-    float fx, fy;
-    if (teleport(fx, fy, 1000, 600))
-    {
-        
-        SDL_Rect renderQuad2 = { static_cast<int>(fx - width / 2),  static_cast<int>(fy - height / 2), width, height };
+    setAlpha(255);
+}
+
+void Ship::setLife(int life)
+{
+    count_life = life;
+}
+
+void Ship::takeLife()
+{
+    if (count_life>=0)
+        count_life--;
+}
+
+void Ship::setDead(bool dead)
+{
+    this->dead = dead;
+}
+
+void Ship::render(int S_width, int S_height, SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip)
+{
+   
+        angle = this->angle;
+        //Set rendering space and render to screen
+        SDL_Rect renderQuad = { static_cast<int>(x - width / 2),  static_cast<int>(y - height / 2), width, height };
+
+        //Set clip rendering dimensions
         if (clip != NULL)
         {
-            renderQuad2.w = clip->w;
-            renderQuad2.h = clip->h;
+            renderQuad.w = clip->w;
+            renderQuad.h = clip->h;
         }
-        //Render to screen   
-        SDL_RenderCopyEx(renderer, texture, clip, &renderQuad2, angle, center, SDL_FLIP_HORIZONTAL);
-    }
-   
-    //Render to screen
-    SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
 
-   
-    renderParticles();
-   
+        float fx, fy;
+        if (teleport(fx, fy, S_width, S_height))
+        {
+
+            SDL_Rect renderQuad2 = { static_cast<int>(fx - width / 2),  static_cast<int>(fy - height / 2), width, height };
+            if (clip != NULL)
+            {
+                renderQuad2.w = clip->w;
+                renderQuad2.h = clip->h;
+            }
+            //Render to screen   
+            SDL_RenderCopyEx(renderer, texture, clip, &renderQuad2, angle, center, SDL_FLIP_HORIZONTAL);
+        }
+
+        //Render to screen
+        SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, SDL_FLIP_HORIZONTAL);
+        renderParticles();
+    
 }
-
 
 void Ship::renderParticles()
 {
@@ -199,4 +243,5 @@ bool Ship::colideAsteroid(Asteroid& ast)
     float fy = ast.y - y;
 
     return  std::sqrt(fx * fx + fy * fy) <= ast.radius + width / 2;
+
 }

@@ -5,8 +5,8 @@
 class BG : public Sprite
 {
 public:
-	BG(const char* path, SDL_Renderer* renderer) : Sprite(path, renderer){}
+	BG(SDL_Renderer* renderer);
 	~BG(){}
 
-	void render() ;
+	void render() const;
 };

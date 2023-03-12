@@ -1,5 +1,11 @@
 #include "Arrow.h"
 
+static const char path[] = "data/Arrow/arrow.tga";
+
+Arrow::Arrow(SDL_Renderer* renderer)
+{
+	initSprite(path, renderer);
+}
 void Arrow::PoolEvent(SDL_Event& e)
 {
 	if (e.type == SDL_MOUSEMOTION)
@@ -9,8 +15,7 @@ void Arrow::PoolEvent(SDL_Event& e)
 	}
 }
 
-
- void Arrow::render(int width_s, int height_s)
+ void Arrow::render(int width_s, int height_s) const
 {
 	 SDL_Rect renderQuad = { static_cast<int>(x - width / 2),  static_cast<int>(y - height / 2), width, height };
 	

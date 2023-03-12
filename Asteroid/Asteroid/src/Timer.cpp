@@ -66,7 +66,7 @@ void Timer::unpause()
     }
 }
 
-Uint32 Timer::getTicks()
+Uint32 Timer::getTicks() const
 {
     //The actual timer time
     Uint32 time = 0;
@@ -90,13 +90,13 @@ Uint32 Timer::getTicks()
     return time;
 }
 
-bool Timer::isStarted()
+bool Timer::isStarted() const
 {
     //Timer is running and paused or unpaused
     return Started;
 }
 
-bool Timer::isPaused()
+bool Timer::isPaused() const
 {
     //Timer is running and paused
     return Paused && Started;
