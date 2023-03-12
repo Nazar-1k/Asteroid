@@ -84,7 +84,7 @@ bool Game::init()
 		{
 			return false;
 		}
-	
+	bullets.push_back(std::unique_ptr<Bullet>(new Bullet{ "data/small_asteroid.png", renderer }));
 	
 	
 
