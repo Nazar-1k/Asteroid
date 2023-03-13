@@ -1,4 +1,4 @@
-# Asteroid_1979
+# Asteroid
 The mini game is written the library (SDL2)
 ![image](https://user-images.githubusercontent.com/82716260/224651621-61c52f96-1683-4293-bae6-7a9ba3790397.png)
 
